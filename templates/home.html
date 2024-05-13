@@ -1,0 +1,37 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Soaporium{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+
+            <!-- Search bar in the nav bar -->
+            <li>
+                <form action="{{ url_for('search') }}" method="get">
+                    <input type="text" name="search_term" placeholder="Search...">
+                    <input type="submit" value="Search">
+                </form>
+            </li>
+
+            {% if session.get("userid") %}
+                <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
+                <li><a href="{{ url_for('userinfo', userid=session.get("userid")) }}">User Info</a></li>
+                <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

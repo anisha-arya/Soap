@@ -1,0 +1,20 @@
+<!-- templates/previous_carts.html -->
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>Previous Carts</h1>
+
+    {% if completed_carts and completed_carts|length > 0 %}
+    <ul>
+        {% for cart in completed_carts %}
+            <li>
+                Cart ID: {{ cart["cartid"] }}  <!-- Ensure correct attribute name -->
+                - Order Date: {{ cart["order_date"] }}
+            </li>
+            <a href="{{ url_for('view_current_cart', cartid=cart["cartid"]) }}">View Current Cart</a> 
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>No previous carts found.</p>
+    {% endif %}
+{% endblock %}

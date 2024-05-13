@@ -1,0 +1,52 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>User Information</h1>
+
+    {% if user %}
+        <p><strong>First Name:</strong> {{ user[1] }}</p> 
+        <p><strong>Last Name:</strong> {{ user[2] }}</p>
+        <p><strong>Email:</strong> {{ user[10] }}</p>
+        <p><strong>Password:</strong> {{user[11]}}</p>
+        <hr>
+        {% if user[3] and user[4] and user[5] and user[6] and user[7] and user[8] and user[9]%}
+        <p><strong>Current Shipping Address:</strong> <p> {{user[3]}} {{user[4]}} </p>
+        <p> {{user[5]}}, {{user[6]}} </p>
+        <p> {{user[7]}}, {{user[8]}} </p>
+        <p> {{user[9]}} </p>
+
+    {% else %}
+        <p>Looks like you haven't filled your address in. Please update your address below.</p>
+
+        <form method="POST" action="{{ url_for('update_address', userid=user[0]) }}">
+            <label for="housenum">House Number:</label>
+            <input type="text" id="housenum" name="housenum" value="{{ user[3] or '' }}">
+
+            <label for="street">Street:</label>
+            <input type="text" id="street" name="street" value="{{ user[4] or '' }}">
+
+            <label for="suburb">Suburb:</label>
+            <input type="text" id="suburb" name="suburb" value="{{ user[5] or '' }}">
+
+            <label for="town">Town:</label>
+            <input type="text" id="town" name="town" value="{{ user[6] or '' }}">
+
+            <label for="region">Region:</label>
+            <input type="text" id="region" name="region" value="{{ user[7] or '' }}">
+
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" value="{{ user[8] or '' }}">
+
+            <label for="postcode">Postal Code:</label>
+            <input type="text" id="postcode" name="postcode" value="{{ user[8] or '' }}">
+
+            <button type="submit">Update Address</button>
+        </form>
+    {% endif %}
+
+
+    {% else %}
+        <p>User information not available.</p>
+    {% endif %}
+
+{% endblock %}

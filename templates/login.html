@@ -1,0 +1,35 @@
+{% extends "home.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <h1>Login</h1>
+    
+    <!-- Login Form -->
+    <form method="POST">
+        <!-- Email Input -->
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <!-- Password Input -->
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <!-- Submit Button -->
+        <button type="submit">Login</button>
+    </form>
+
+    <!-- Link to Sign-Up Page -->
+    <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+    
+    <!-- Flash Messages for Errors or Other Notifications -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+{% endblock %}
