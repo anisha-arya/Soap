@@ -2,29 +2,34 @@
 {% extends "home.html" %}
 
 {% block content %}
-<h1>Search Results</h1>
+<div class="search-results-container">
+    <h1>Search Results</h1>
 
-<!-- Large search bar for the search page -->
-<form action="{{ url_for('search') }}" method="get">
-    <input type="text" name="search_term" placeholder="Search..." size="30">
-    <input type="submit" value="Search">
-</form>
+    <!-- Large search bar for the search page -->
+    <form action="{{ url_for('search') }}" method="get" class="search-form">
+        <input type="text" name="search_term" placeholder="Search..." size="30">
+        <button type="submit">Search</button>
+    </form>
 
-{% if results and results|length > 0 %}
-<ul>
-    {% for item in results %}
-    <li>
-        {{ item[1] }} <!-- Soap name -->
-        - {{ item[2] }} <!-- Soap description -->
-        - Price: ${{ item[4] }} <!-- Soap price -->
-        <a href="{{ url_for('add_to_cart', soapid=item[0]) }}">Add to Cart</a> <!-- Use soapid for adding to cart -->
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No results found</p> <!-- If no results, show this message -->
-{% endif %}
+    {% if results and results|length > 0 %}
+    <ul class="results-list">
+        {% for item in results %}
+        <li class="result-item">
+            <div class="soap-info">
+                <h2>{{ item[1] }}</h2> <!-- Soap name -->
+                <p class="description">{{ item[2] }}</p> <!-- Soap description -->
+                <p class="price">Price: ${{ item[4] }}</p> <!-- Soap price -->
+            </div>
+            <a href="{{ url_for('add_to_cart', soapid=item[0]) }}" class="add-to-cart">Add to Cart</a>
+            <!-- Use soapid for adding to cart -->
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="no-results">No results found</p> <!-- If no results, show this message -->
+    {% endif %}
 
-<!-- Link back to home -->
-<a href="{{ url_for('home') }}">Back to Home</a> <!-- Navigation back to home -->
+    <!-- Link back to home -->
+    <a href="{{ url_for('home') }}" class="back-to-home">Back to Home</a> <!-- Navigation back to home -->
+</div>
 {% endblock %}

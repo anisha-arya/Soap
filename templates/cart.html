@@ -2,28 +2,32 @@
 {% extends "home.html" %}
 
 {% block content %}
-<h1>Your Cart</h1>
+<div class="cart-container">
+    <h1>Your Cart</h1>
 
-{% if cart_items and cart_items|length > 0 %}
-<ul>
-    {% for item in cart_items %}
-    <li>
-        {{ item[1] }} <!-- Soap name -->
-        - Quantity: {{ item[3] }} <!-- Total quantity for each soap -->
-        - Unit Price: ${{ item[2] }} <!-- Unit price -->
-        - Total Price: ${{ item[2] * item[3] }} <!-- Total price for each soap -->
-        <a href="{{ url_for('decrease_quantity', cartid=cartid, soapid=item[0] )}}">Remove one</a>
-    </li>
-    {% endfor %}
-</ul>
+    {% if cart_items and cart_items|length > 0 %}
+    <ul>
+        {% for item in cart_items %}
+        <li class="cart-item">
+            <h2>{{ item[1] }}</h2> <!-- Soap name -->
+            <p>Quantity: {{ item[3] }}</p> <!-- Total quantity for each soap -->
+            <p>Unit Price: ${{ item[2] }}</p> <!-- Unit price -->
+            <p>Total Price: ${{ item[2] * item[3] }}</p> <!-- Total price for each soap -->
+            <a href="{{ url_for('decrease_quantity', cartid=cartid, soapid=item[0] )}}">Remove one</a>
+        </li>
+        {% endfor %}
+    </ul>
 
-<p>Total Price: ${{ total_price }}</p> <!-- Total price for the entire cart -->
+    <p class="total-price">Total Price: ${{ total_price }}</p> <!-- Total price for the entire cart -->
 
-{% else %}
-<p>Your cart is empty</p>
-{% endif %}
+    {% else %}
+    <p>Your cart is empty</p>
+    {% endif %}
 
-<!-- Navigation links -->
-<a href="{{ url_for('complete_order', cartid=cartid) }}">Complete order</a>
-<a href="{{ url_for('home') }}">Back to Home</a>
+    <!-- Navigation links -->
+    <div class="cart-navigation">
+        <a href="{{ url_for('complete_order', cartid=cartid) }}">Complete order</a>
+        <a href="{{ url_for('home') }}">Back to Home</a>
+    </div>
+</div>
 {% endblock %}

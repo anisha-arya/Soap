@@ -3,33 +3,39 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
+<div class="login-container">
     <h1>Login</h1>
-    
+
     <!-- Login Form -->
-    <form method="POST">
+    <form method="POST" class="login-form">
         <!-- Email Input -->
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
 
         <!-- Password Input -->
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
 
         <!-- Submit Button -->
-        <button type="submit">Login</button>
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
 
     <!-- Link to Sign-Up Page -->
     <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
-    
+
     <!-- Flash Messages for Errors or Other Notifications -->
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     {% endwith %}
+</div>
 {% endblock %}
