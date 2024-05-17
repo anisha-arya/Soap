@@ -24,7 +24,7 @@
                 {% if session.get("userid") %}
                 <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
                 <li class="user-dropdown">
-                    <button class="user-dropdown-btn">Hi, {{ userid }}</button>
+                    <button class="user-dropdown-btn">Hi, {{ user_firstname }}</button>
                     <ul class="dropdown-content">
                         <li><a href="{{ url_for('userinfo', userid=session.get("userid")) }}">User Info</a></li>
                         <li><a href="{{ url_for('logout') }}">Sign Out</a></li>

@@ -1,35 +1,53 @@
+/* Add this CSS to your existing stylesheet */
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
 
-.homelink, h1, h2, h3, h4, h5, h6 {
-    font-family: 'Rock Salt', cursive; /* Apply Rock Salt font to all headings */
+.home-link,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Rock Salt', cursive;
+    /* Apply Rock Salt font to all headings */
 }
 
 body {
-    font-family: 'Lora', serif; /* Change font family */
+    font-family: 'Lora', serif;
+    /* Change font family */
     margin: 0;
     padding: 0;
-    background-color: #faf9f9; /* Background color */
-    color: #2b3d41; /* Text color */
+    background-color: #faf9f9;
+    /* Background color */
+    color: #2b3d41;
+    /* Text color */
 }
 
+/* Add this CSS to your existing stylesheet */
 .top-bar {
-    background-color: #b5446e; /* Top bar color */
-    color: #fff; /* Text color */
+    background-color: #b5446e;
+    /* Top bar color */
+    color: #fff;
+    /* Text color */
     padding: 10px;
     display: flex;
-    justify-content: space-between; /* Space elements evenly */
-    align-items: center; /* Center items vertically */
+    justify-content: space-between;
+    /* Space elements evenly */
+    align-items: center;
+    /* Center items vertically */
 }
 
 .home-link {
-    color: #fff; /* Home link text color */
+    color: #fff;
+    /* Home link text color */
     text-decoration: none;
 }
 
 .navbar {
     display: flex;
-    align-items: center; /* Center items vertically */
+    align-items: center;
+    /* Center items vertically */
 }
 
 .nav-links {
@@ -44,65 +62,71 @@ body {
 }
 
 .nav-links li a {
-    color: #fff; /* Nav links text color */
+    color: #fff;
+    /* Nav links text color */
     text-decoration: none;
 }
 
 .search-bar {
     display: flex;
-    align-items: center; /* Center items vertically */
+    align-items: center;
+    /* Center items vertically */
 }
 
 .search-bar input[type="text"] {
     padding: 5px;
     font-size: 16px;
-    border: none;
+    border: 1px solid #ddd;
     border-radius: 3px 0 0 3px;
 }
 
 .search-bar button {
     padding: 5px 10px;
-    background-color: #eacbd2; /* Search button color */
-    color: #fff; /* Search button text color */
+    font-size: 16px;
+    background-color: #eacbd2;
+    /* Search button color */
+    color: #fff;
+    /* Search button text color */
     border: none;
     border-radius: 0 3px 3px 0;
     cursor: pointer;
 }
 
 .search-bar button:hover {
-    background-color: #2b3d41; /* Darker search button color on hover */
+    background-color: #2b3d41;
+    /* Darker search button color on hover */
 }
 
 .user-dropdown {
     position: relative;
 }
 
-.user-dropdown-btn {
-    background-color: transparent;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-
 .dropdown-content {
+    visibility: hidden;
+    /* Initially hide the dropdown */
     display: none;
     position: absolute;
-    background-color: #b5446e; /* Dropdown menu color */
+    background-color: #98c1d9;
+    /* Dropdown menu color */
     min-width: 120px;
     z-index: 1;
     border-radius: 3px;
-    right: 0; /* Align the dropdown menu to the right */
+    right: 0;
+    /* Align the dropdown menu to the right */
     display: flex;
     flex-direction: column;
 }
 
 .user-dropdown:hover .dropdown-content {
-    display: block; /* Display the dropdown menu when hovering over the user-dropdown */
+    visibility: visible;
+    /* Show the dropdown on hover */
+    display: block;
 }
 
 .dropdown-content li {
     padding: 10px;
-    width: 100%; /* Make each list item fill the width of the dropdown */
+    width: 100%;
+    /* Make each list item fill the width of the dropdown */
 }
 
 .dropdown-content li a {
@@ -111,7 +135,8 @@ body {
 }
 
 .dropdown-content li:hover {
-    background-color: #eacbd2; /* Darker dropdown menu color on hover */
+    background-color: #2b3d41;
+    /* Darker dropdown menu color on hover */
 }
 
 .content {
@@ -128,7 +153,8 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #faf9f9; /* Container background color */
+    background-color: #faf9f9;
+    /* Container background color */
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -164,7 +190,8 @@ button,
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #98c1d9; /* Blue button color */
+    background-color: #98c1d9;
+    /* Blue button color */
     color: #fff;
     border: none;
     border-radius: 3px;
@@ -174,7 +201,8 @@ button,
 
 button:hover,
 .add-to-cart:hover {
-    background-color: #2b3d41; /* Darker blue on hover */
+    background-color: #2b3d41;
+    /* Darker blue on hover */
 }
 
 .flash-messages {
@@ -184,7 +212,8 @@ button:hover,
 
 .flash-messages li {
     margin-bottom: 5px;
-    color: #d9534f; /* Red color for error messages */
+    color: #d9534f;
+    /* Red color for error messages */
 }
 
 .no-results {

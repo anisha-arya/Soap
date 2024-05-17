@@ -10,7 +10,16 @@ app.secret_key = secrets.token_hex(24)
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    user_firstname = None
+    userid = session.get("userid")
+    if userid:
+        conn = sqlite3.connect("Soap.db")
+        sql = "SELECT fname FROM User WHERE userid = ?"
+        user = conn.execute(sql, (userid,)).fetchone()
+        if user:
+            user_firstname = user[0]
+        conn.close()
+    return render_template("home.html", user_firstname=user_firstname)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -76,6 +85,10 @@ def logout():
 
 @app.route("/user/<int:userid>")
 def userinfo(userid):
+    session_userid = session.get("userid")
+    if session_userid != userid:
+        flash("Authentication error")
+        return redirect(url_for("home"))
     conn = sqlite3.connect("Soap.db")
     sql = "SELECT * FROM User WHERE userid = ?"
     user = conn.execute(sql, (userid,)).fetchone()
