@@ -1,4 +1,3 @@
-/* Add this CSS to your existing stylesheet */
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
 
@@ -10,44 +9,33 @@ h4,
 h5,
 h6 {
     font-family: 'Rock Salt', cursive;
-    /* Apply Rock Salt font to all headings */
 }
 
 body {
     font-family: 'Lora', serif;
-    /* Change font family */
     margin: 0;
     padding: 0;
     background-color: #faf9f9;
-    /* Background color */
     color: #2b3d41;
-    /* Text color */
 }
 
-/* Add this CSS to your existing stylesheet */
 .top-bar {
     background-color: #b5446e;
-    /* Top bar color */
     color: #fff;
-    /* Text color */
     padding: 10px;
     display: flex;
     justify-content: space-between;
-    /* Space elements evenly */
     align-items: center;
-    /* Center items vertically */
 }
 
 .home-link {
     color: #fff;
-    /* Home link text color */
     text-decoration: none;
 }
 
 .navbar {
     display: flex;
     align-items: center;
-    /* Center items vertically */
 }
 
 .nav-links {
@@ -63,14 +51,12 @@ body {
 
 .nav-links li a {
     color: #fff;
-    /* Nav links text color */
     text-decoration: none;
 }
 
 .search-bar {
     display: flex;
     align-items: center;
-    /* Center items vertically */
 }
 
 .search-bar input[type="text"] {
@@ -84,9 +70,7 @@ body {
     padding: 5px 10px;
     font-size: 16px;
     background-color: #eacbd2;
-    /* Search button color */
     color: #fff;
-    /* Search button text color */
     border: none;
     border-radius: 0 3px 3px 0;
     cursor: pointer;
@@ -94,7 +78,6 @@ body {
 
 .search-bar button:hover {
     background-color: #2b3d41;
-    /* Darker search button color on hover */
 }
 
 .user-dropdown {
@@ -103,30 +86,25 @@ body {
 
 .dropdown-content {
     visibility: hidden;
-    /* Initially hide the dropdown */
     display: none;
     position: absolute;
     background-color: #98c1d9;
-    /* Dropdown menu color */
     min-width: 120px;
     z-index: 1;
     border-radius: 3px;
     right: 0;
-    /* Align the dropdown menu to the right */
     display: flex;
     flex-direction: column;
 }
 
 .user-dropdown:hover .dropdown-content {
     visibility: visible;
-    /* Show the dropdown on hover */
     display: block;
 }
 
 .dropdown-content li {
     padding: 10px;
     width: 100%;
-    /* Make each list item fill the width of the dropdown */
 }
 
 .dropdown-content li a {
@@ -136,11 +114,6 @@ body {
 
 .dropdown-content li:hover {
     background-color: #2b3d41;
-    /* Darker dropdown menu color on hover */
-}
-
-.content {
-    padding: 20px;
 }
 
 .content {
@@ -154,44 +127,68 @@ body {
     margin: 0 auto;
     padding: 20px;
     background-color: #faf9f9;
-    /* Container background color */
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.login-form,
-.signup-form,
-.search-form {
-    margin-bottom: 20px;
+ul.results-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
+li.result-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     border: 1px solid #ddd;
-    border-radius: 3px;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
-button,
+li.result-item .soap-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.item-image {
+    display: block;
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+
+h2 {
+    margin: 10px 0;
+    font-size: 1.5em;
+}
+
+.description {
+    margin: 10px 0;
+    font-size: 1em;
+}
+
+.price {
+    margin: 10px 0;
+    font-size: 1em;
+    font-weight: bold;
+}
+
 .add-to-cart {
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
     background-color: #98c1d9;
-    /* Blue button color */
     color: #fff;
     border: none;
     border-radius: 3px;
@@ -199,21 +196,15 @@ button,
     text-decoration: none;
 }
 
-button:hover,
 .add-to-cart:hover {
     background-color: #2b3d41;
-    /* Darker blue on hover */
 }
 
-.flash-messages {
-    list-style-type: none;
-    padding: 0;
-}
-
-.flash-messages li {
-    margin-bottom: 5px;
-    color: #d9534f;
-    /* Red color for error messages */
+hr {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
 }
 
 .no-results {
@@ -224,6 +215,16 @@ button:hover,
     display: block;
     margin-top: 20px;
     text-decoration: underline;
+}
+
+.flash-messages {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    margin-bottom: 5px;
+    color: #d9534f;
 }
 
 .cart-container {

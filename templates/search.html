@@ -16,12 +16,14 @@
         {% for item in results %}
         <li class="result-item">
             <div class="soap-info">
+                <img src="{{ item[6] }}" alt="{{ item[1] }}" class="item-image">
                 <h2>{{ item[1] }}</h2> <!-- Soap name -->
                 <p class="description">{{ item[2] }}</p> <!-- Soap description -->
                 <p class="price">Price: ${{ item[4] }}</p> <!-- Soap price -->
             </div>
             <a href="{{ url_for('add_to_cart', soapid=item[0]) }}" class="add-to-cart">Add to Cart</a>
             <!-- Use soapid for adding to cart -->
+            <hr>
         </li>
         {% endfor %}
     </ul>
