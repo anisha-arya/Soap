@@ -2,6 +2,16 @@
 {% extends "home.html" %}
 
 {% block content %}
+<!-- Flash Messages for Errors or Other Notifications -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flash-messages">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
 <div class="cart-container">
     <h1>Your Cart</h1>
 

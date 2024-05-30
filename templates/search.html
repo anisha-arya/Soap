@@ -8,7 +8,7 @@
     <!-- Large search bar for the search page -->
     <form action="{{ url_for('search') }}" method="get" class="search-form">
         <input type="text" name="search_term" placeholder="Search..." size="30">
-        <button type="submit">Search</button>
+        <button type="submit" class="search-button">Search</button>
     </form>
 
     {% if results and results|length > 0 %}
@@ -21,6 +21,16 @@
                 <p class="description">{{ item[2] }}</p> <!-- Soap description -->
                 <p class="price">Price: ${{ item[4] }}</p> <!-- Soap price -->
             </div>
+            <!-- Flash Messages for Errors or Other Notifications -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
             <a href="{{ url_for('add_to_cart', soapid=item[0]) }}" class="add-to-cart">Add to Cart</a>
             <!-- Use soapid for adding to cart -->
             <hr>
