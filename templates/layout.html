@@ -1,0 +1,45 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Soaporium{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="top-bar">
+        <a href="{{ url_for('home') }}" class="home-link">Soaporium</a>
+        <nav class="navbar">
+            <ul class="nav-links">
+                <!-- Search bar in the nav bar -->
+                <li class="search-bar">
+                    <form action="{{ url_for('search') }}" method="get">
+                        <input type="text" name="search_term" placeholder="Search...">
+                        <button type="submit">Search</button>
+                    </form>
+                </li>
+
+                {% if session.get("userid") %}
+                <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
+                <li class="user-dropdown">
+                    <button class="user-dropdown-btn">Hi, {{ user_firstname }}</button>
+                    <ul class="dropdown-content">
+                        <li><a href="{{ url_for('userinfo', userid=session.get("userid")) }}">User Info</a></li>
+                        <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+
+</html>

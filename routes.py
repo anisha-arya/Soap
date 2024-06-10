@@ -81,7 +81,16 @@ def signup():
             return render_template("signup.html")
 
         if not existing_user:
-            # If user doesn't exist, add user's submitted info to database
+            if len(fname) < 2 or len(fname) > 50 or\
+                    len(lname) < 2 or len(lname) > 50:
+                flash('Name must be between 2 and 50 characters', 'error')
+                return redirect(url_for('signup'))
+
+            if len(password) < 8 or len(password) > 100 or\
+                    len(email) < 8 or len(email) > 100:
+                flash('Password must be between 8 and 100 characters', 'error')
+                return redirect(url_for('signup'))
+
             sql = (
                 "INSERT INTO User (fname, lname, email, password) \
                     VALUES (?, ?, ?, ?)"
@@ -262,8 +271,9 @@ def add_to_cart(soapid):
     conn.close()
 
     # Tell user item has been successfully added, return cart.html
-    flash("Item added to your cart")
-    return redirect(url_for("search"))
+    flash(f'Item {soapid} added to cart', 'success')
+    return redirect(url_for('search',
+                            search_term=request.args.get('search_term')))
 
 
 # Completeing order route

@@ -2,39 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
 
-/* Large screen display (3 columns) */
-@media (min-width: 1030px) {
-    .results-list {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* Medium screen display (2 columns) */
-@media (max-width: 1029px) {
-    .results-list {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Small screen display (1 column) */
-@media (max-width: 599px) {
-    .results-list {
-        grid-template-columns: repeat(1, 1fr);
-    }
-}
-
-/* Set headers to Rock Salt font */
-.home-link,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: 'Rock Salt', cursive;
-}
-
-/* Set body font as Lora, background colour to seasalt */
+/* Global Styles */
 body {
     font-family: 'Lora', serif;
     margin: 0;
@@ -43,6 +11,22 @@ body {
     color: #2b3d41;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.home-link {
+    font-family: 'Rock Salt', cursive;
+}
+
+ul,
+li {
+    list-style-type: none;
+}
+
+/* Header and Navigation */
 .top-bar {
     background-color: #b5446e;
     color: #fff;
@@ -52,7 +36,8 @@ body {
     align-items: center;
 }
 
-.home-link {
+.home-link,
+.nav-links li a {
     color: #fff;
     text-decoration: none;
 }
@@ -73,23 +58,15 @@ body {
     margin-right: 20px;
 }
 
-.nav-links li a {
-    color: #fff;
-    text-decoration: none;
-}
-
-.search-bar {
-    display: flex;
-    align-items: center;
-}
-
-.search-bar input[type="text"] {
+.search-bar input[type="text"],
+.search-form input[type="text"] {
     padding: 5px;
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 3px 0 0 3px;
 }
 
+.search-form button,
 .search-bar button {
     padding: 5px 10px;
     font-size: 16px;
@@ -100,38 +77,60 @@ body {
     cursor: pointer;
 }
 
-.search-bar button:hover {
-    background-color: #2b3d41;
-    border: 1px solid #2b3d41
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #faf9f9;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
 }
 
-.user-dropdown {
-    position: relative;
+.hero-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
 }
 
-.dropdown-content {
-    visibility: hidden;
-    display: none;
-    position: absolute;
-    background-color: #98c1d9;
-    min-width: 120px;
-    z-index: 1;
-    border-radius: 3px;
-    right: 0;
+.hero-section p {
+    font-size: 1.2rem;
+}
+
+/* Home Page Items */
+.home-items {
     display: flex;
-    flex-direction: column;
-}
-
-/* Make dropdown items only visible on hover */
-.user-dropdown:hover .dropdown-content {
-    visibility: visible;
-    display: block;
-}
-
-.content {
+    justify-content: space-around;
+    flex-wrap: wrap;
     padding: 20px;
 }
 
+.hitem {
+    width: 100%;
+    margin: 20px 0;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.hitem a {
+    text-decoration: none;
+}
+
+.hitem img {
+    width: 100%;
+    height: auto;
+}
+
+.hitem h2 {
+    padding: 10px;
+    background-color: #f8f8f8;
+    margin: 0;
+    font-size: 1.2rem;
+    color: #b5446e;
+}
+
+/* Login and Signup Containers */
 .login-container,
 .signup-container {
     max-width: 800px;
@@ -143,6 +142,50 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+}
+
+.login-form,
+.signup-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button[type="submit"] {
+    padding: 10px;
+    font-size: 1rem;
+    color: white;
+    background-color: #eacbd2;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #b5446e;
+}
+
+/* Search Results */
 .search-results-container {
     width: 100%;
     max-width: 1200px;
@@ -152,13 +195,22 @@ body {
 
 .results-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible columns */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
     padding: 0;
     margin: 0;
 }
 
-/* Each result item */
+.results-list.single-item {
+    display: flex;
+    justify-content: center;
+}
+
+.results-list.single-item .result-item {
+    max-width: 400px;
+    /* Adjust as needed */
+}
+
 .result-item {
     box-sizing: border-box;
     background-color: #fff;
@@ -169,8 +221,8 @@ body {
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Ensures the button and hr are at the bottom */
-    height: 100%; /* Make all items the same height */
+    justify-content: space-between;
+    height: 100%;
 }
 
 .result-item p {
@@ -186,24 +238,18 @@ body {
     margin-bottom: 10px;
 }
 
-h2 {
-    margin: 10px 0;
-    font-size: 1.2em;
-}
-
-.description {
+.description,
+.price {
     margin: 10px 0;
     font-size: 1em;
 }
 
 .price {
-    margin: 10px 0;
-    font-size: 1em;
     font-weight: bold;
 }
 
 .add-to-cart,
-.user-dropdown-btn, .search.button {
+.user-dropdown-btn {
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
@@ -215,71 +261,11 @@ h2 {
     text-decoration: none;
 }
 
-ul,
-li {
-    list-style-type: none;
-}
-
-.search-form {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 1em;
-}
-
-.search-form input[type="text"] {
-    padding: 5px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 3px 0 0 3px;
-}
-
-.search-form button {
-    padding: 5px 10px;
-    font-size: 16px;
-    background-color: #eacbd2;
-    color: #fff;
-    border: 1px solid #eacbd2;
-    border-radius: 0 3px 3px 0;
-    cursor: pointer;
-}
-
-.search-form button:hover {
-    background-color: #2b3d41;
-    border: 1px solid #2b3d41
-}
-
 .add-to-cart:hover {
     background-color: #2b3d41;
 }
 
-hr {
-    width: 100%;
-    border: 0;
-    border-top: 1px solid #ddd;
-    margin: 10px 0;
-}
-
-.no-results {
-    font-style: italic;
-}
-
-.back-to-home {
-    display: block;
-    margin-top: 20px;
-    text-decoration: underline;
-}
-
-.flash-messages {
-    list-style-type: none;
-    padding: 0;
-}
-
-.flash-messages li {
-    margin-bottom: 5px;
-    color: #d9534f;
-}
-
+/* Cart Page */
 .cart-container {
     max-width: 800px;
     margin: 0 auto;
@@ -333,6 +319,7 @@ hr {
     background-color: #eacbd2;
 }
 
+/* User Info Page */
 .user-info-container {
     max-width: 800px;
     margin: 0 auto;
@@ -377,4 +364,75 @@ hr {
 
 .user-info-form button:hover {
     background-color: #eacbd2;
+}
+
+/* User Dropdown */
+.user-dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    visibility: hidden;
+    display: none;
+    position: absolute;
+    background-color: #98c1d9;
+    min-width: 120px;
+    z-index: 1;
+    border-radius: 3px;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-dropdown:hover .dropdown-content {
+    visibility: visible;
+    display: block;
+}
+
+/* Flash Messages */
+.flash-messages {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    margin-bottom: 5px;
+    color: #d9534f;
+}
+
+hr {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
+}
+
+/* No Results */
+.no-results {
+    font-style: italic;
+}
+
+.back-to-home {
+    display: block;
+    margin-top: 20px;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (min-width: 1030px) {
+    .results-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1029px) and (min-width: 600px) {
+    .results-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 599px) {
+    .results-list {
+        grid-template-columns: repeat(1, 1fr);
+    }
 }

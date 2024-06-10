@@ -1,5 +1,5 @@
 <!-- templates/user_info.html -->
-{% extends "home.html" %}
+{% extends "layout.html" %}
 
 {% block content %}
 <div class="user-info-container">
@@ -18,35 +18,35 @@
     <p>{{ user[7] }}, {{ user[8] }}</p>
     <p>{{ user[9] }}</p>
     {% else %}
-    <p>Looks like you haven't filled your address in. Please update your address below.</p>
+    <p>Looks like you haven't filled your shipping address in. Please update your address below.</p>
 
     <form class="user-info-form" method="POST" action="{{ url_for('update_address', userid=user[0]) }}">
-        <label for="housenum">House Number:</label>
+        <label for="housenum">House Number</label>
         <input type="text" id="housenum" name="housenum" value="{{ user[3] or '' }}">
 
-        <label for="street">Street:</label>
+        <label for="street">Street</label>
         <input type="text" id="street" name="street" value="{{ user[4] or '' }}">
 
-        <label for="suburb">Suburb:</label>
+        <label for="suburb">Suburb</label>
         <input type="text" id="suburb" name="suburb" value="{{ user[5] or '' }}">
 
-        <label for="town">Town:</label>
+        <label for="town">Town</label>
         <input type="text" id="town" name="town" value="{{ user[6] or '' }}">
 
-        <label for="region">Region:</label>
+        <label for="region">Region</label>
         <input type="text" id="region" name="region" value="{{ user[7] or '' }}">
 
-        <label for="country">Country:</label>
+        <label for="country">Country</label>
         <input type="text" id="country" name="country" value="{{ user[8] or '' }}">
 
-        <label for="postcode">Postal Code:</label>
+        <label for="postcode">Postal Code</label>
         <input type="text" id="postcode" name="postcode" value="{{ user[9] or '' }}">
 
         <button type="submit">Update Address</button>
     </form>
     {% endif %}
     {% else %}
-    <p>User information not available.</p>
+    <p>User information not available</p>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,5 +1,4 @@
-<!-- templates/search_results.html -->
-{% extends "home.html" %}
+{% extends "layout.html" %}
 
 {% block content %}
 <div class="search-results-container">
@@ -21,16 +20,20 @@
                 <p class="description">{{ item[2] }}</p> <!-- Soap description -->
                 <p class="price">Price: ${{ item[4] }}</p> <!-- Soap price -->
             </div>
-            <!-- Flash Messages for Errors or Other Notifications -->
-            {% with messages = get_flashed_messages() %}
+            
+            <!-- Flash Message for Specific Soap -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
             <ul class="flash-messages">
-                {% for message in messages %}
-                <li>{{ message }}</li>
+                {% for category, message in messages %}
+                {% if 'Item ' ~ item[0] ~ ' added to cart' in message %}
+                <li class="{{ category }}">{{ message }}</li>
+                {% endif %}
                 {% endfor %}
             </ul>
             {% endif %}
             {% endwith %}
+            
             <a href="{{ url_for('add_to_cart', soapid=item[0]) }}" class="add-to-cart">Add to Cart</a>
             <!-- Use soapid for adding to cart -->
             <hr>
