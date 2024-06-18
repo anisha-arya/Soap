@@ -58,23 +58,44 @@ li {
     margin-right: 20px;
 }
 
-.search-bar input[type="text"],
+.search-form {
+    margin-bottom: 1em;
+}
+
+.search-bar input[type="text"] {
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    height: 1em;
+    width: 15em;
+}
+
 .search-form input[type="text"] {
     padding: 5px;
     font-size: 16px;
     border: 1px solid #ddd;
-    border-radius: 3px 0 0 3px;
+    height: 2em;
+    width: 30em;
 }
 
-.search-form button,
-.search-bar button {
-    padding: 5px 10px;
+.search-form button {
+    padding: 10px;
     font-size: 16px;
     background-color: #eacbd2;
     color: #fff;
-    border: 1px solid #eacbd2;
-    border-radius: 0 3px 3px 0;
     cursor: pointer;
+    height: 3em;
+    width: 5em;
+}
+
+.search-bar button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #eacbd2;
+    color: #fff;
+    cursor: pointer;
+    height: 1em;
+    width: 5em;
 }
 
 /* Hero Section */
@@ -105,7 +126,7 @@ li {
 
 .hitem {
     width: 100%;
-    margin: 20px 0;
+    margin-bottom: 20px;
     text-align: center;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -128,6 +149,18 @@ li {
     margin: 0;
     font-size: 1.2rem;
     color: #b5446e;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-color: #2b3d41;
+    padding-left: 1em;
+}
+
+.footer p {
+    color:#faf9f9;
 }
 
 /* Login and Signup Containers */
@@ -208,7 +241,6 @@ button[type="submit"]:hover {
 
 .results-list.single-item .result-item {
     max-width: 400px;
-    /* Adjust as needed */
 }
 
 .result-item {
@@ -227,6 +259,10 @@ button[type="submit"]:hover {
 
 .result-item p {
     margin-bottom: 1em;
+}
+
+.result-item h2 {
+    font-size: 1.2em;
 }
 
 .item-image {

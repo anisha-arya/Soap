@@ -333,7 +333,7 @@ def previous_carts():
 # Search route
 @app.route("/search", methods=["GET", "POST"])
 def search():
-    # Get the search term infputted by user, strip it of spaces
+    # Get the search term inputted by user, strip it of spaces
     search_term = request.args.get("search_term", "").strip()
 
     conn = sqlite3.connect("Soap.db")
@@ -384,7 +384,7 @@ def decrease_quantity(soapid):
         conn.close()
         return redirect(url_for("view_current_cart"))
 
-    # Set new quantity as -1 less that current
+    # Set new quantity as -1 less than current
     new_quantity = cart_item[2] - 1
 
     if new_quantity > 0:
