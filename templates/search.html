@@ -6,8 +6,10 @@
 
     <!-- Large search bar for the search page -->
     <form action="{{ url_for('search') }}" method="get" class="search-form">
+        <div class="input-wrapper">
         <input type="text" name="search_term" placeholder="Search...">
         <button type="submit" class="search-button">Search</button>
+        </div>
     </form>
 
     {% if results and results|length > 0 %}
@@ -18,7 +20,7 @@
                 <img src="{{ item[6] }}" alt="{{ item[1] }}" class="item-image">
                 <h2>{{ item[1] }}</h2> <!-- Soap name -->
                 <p class="description">{{ item[2] }}</p> <!-- Soap description -->
-                <p class="price">Price: ${{ item[4] }}</p> <!-- Soap price -->
+                <p class="price">${{ item[4] }}</p> <!-- Soap price -->
             </div>
             
             <!-- Flash Message for Specific Soap -->
