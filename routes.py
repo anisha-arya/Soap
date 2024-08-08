@@ -6,27 +6,30 @@ import secrets
 
 app = Flask(__name__)
 
+
 # Generates a 24-hex secret key
 app.secret_key = secrets.token_hex(24)
+
+
+# Context processor to inject the user's first name into all templates
+@app.context_processor
+def inject_user_firstname():
+    user_firstname = None
+    userid = session.get("userid")
+    if userid:
+        conn = sqlite3.connect("Soap.db")
+        sql = "SELECT fname FROM User WHERE userid = ?"
+        user = conn.execute(sql, (userid,)).fetchone()
+        if user:
+            user_firstname = user[0]
+        conn.close()
+    return dict(user_firstname=user_firstname)
 
 
 # Home page route
 @app.route("/")
 def home():
-    user_firstname = None
-    # Get the userid for the user currently using the site
-    userid = session.get("userid")
-    if userid:
-        conn = sqlite3.connect("Soap.db")
-        # SQL for getting the firstname for the user
-        sql = "SELECT fname FROM User WHERE userid = ?"
-        user = conn.execute(sql, (userid,)).fetchone()
-        if user:
-            # Make sure there's only 1 instance being referrenced
-            user_firstname = user[0]
-        conn.close()
-    # Return home.html, pass on the user's firstname to template
-    return render_template("home.html", user_firstname=user_firstname)
+    return render_template("home.html")
 
 
 # Login route
