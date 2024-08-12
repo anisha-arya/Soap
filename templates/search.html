@@ -7,10 +7,59 @@
     <!-- Large search bar for the search page -->
     <form action="{{ url_for('search') }}" method="get" class="search-form">
         <div class="input-wrapper">
-        <input type="text" name="search_term" placeholder="Search...">
-        <button type="submit" class="search-button">Search</button>
+            <li class="filter-dropdown">
+                <button class="filter-button">Filter</button>
+                <ul class="search-dropdown-content">
+                    <li>
+                        <a href="{{ url_for('search', search_term=search_term, filter='bar', sort=sort_option) }}">
+                            Bar soaps
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('search', search_term=search_term, filter='liquid', sort=sort_option) }}">
+                            Liquid soaps
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="sort-dropdown">
+                <button class="sort-button">Sort</button>
+                <ul class="search-dropdown-content">
+                    <li>
+                        <a
+                            href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='relevance') }}">
+                            Relevance
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='ascending') }}">
+                            Price: Ascending
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='descending') }}">
+                            Price: Descending
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='alpha') }}">
+                            Alphabetical
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <input type="text" name="search_term" placeholder="Search..." value="{{ search_term }}">
+            <button type="submit" class="search-button">Search</button>
         </div>
     </form>
+
+    <!-- Clear Filters Link -->
+    <li class="clear-filters">
+        <a href="{{ url_for('search', search_term=search_term) }}">Clear Filters</a>
+    </li>
 
     {% if results and results|length > 0 %}
     <ul class="results-list">
@@ -22,7 +71,7 @@
                 <p class="description">{{ item[2] }}</p> <!-- Soap description -->
                 <p class="price">${{ item[4] }}</p> <!-- Soap price -->
             </div>
-            
+
             <!-- Flash Message for Specific Soap -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -35,7 +84,7 @@
             </ul>
             {% endif %}
             {% endwith %}
-            
+
             <a href="{{ url_for('add_to_cart', soapid=item[0]) }}" class="add-to-cart">Add to Cart</a>
             <!-- Use soapid for adding to cart -->
             <hr>

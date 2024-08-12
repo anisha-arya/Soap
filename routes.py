@@ -1,6 +1,7 @@
 # Import Flask and Flask properties, sqlite3, secrets
 from flask import Flask, render_template, request, redirect, \
     url_for, flash, session
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import secrets
 
@@ -35,28 +36,20 @@ def home():
 # Login route
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    user = None
-    # If a user wants to login by submitting their email and password
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
         conn = sqlite3.connect("Soap.db")
-        # SQL to check if a user with the submitted email and password exists
-        sql = "SELECT * FROM User WHERE email = ? AND password = ?"
-        user = conn.execute(sql, (email, password)).fetchone()
+        sql = "SELECT * FROM User WHERE email = ?"
+        user = conn.execute(sql, (email,)).fetchone()
         conn.close()
 
-    if user:
-        # If a user exists, set the sessionid to the user's id
-        session["userid"] = user[0]
-        # Return user.html, pass on the userid to template
-        return redirect(url_for("userinfo", userid=user[0]))
+        if user and check_password_hash(user[11], password):
+            session["userid"] = user[0]
+            return redirect(url_for("userinfo", userid=user[0]))
+        else:
+            flash("Incorrect email or password")
 
-    if not user:
-        # If a user doesn't exist tell the user something's wrong
-        flash("Login or sign up to continue")
-
-    # Return login.html
     return render_template("login.html")
 
 
@@ -70,6 +63,8 @@ def signup():
         lname = request.form["lname"]
         email = request.form["email"]
         password = request.form["password"]
+        # Hash the password
+        hashed_password = generate_password_hash(password)
 
         conn = sqlite3.connect("Soap.db")
         # SQL for checking if there's already a user with the submitted email
@@ -98,7 +93,7 @@ def signup():
                 "INSERT INTO User (fname, lname, email, password) \
                     VALUES (?, ?, ?, ?)"
                     )
-            conn.execute(sql, (fname, lname, email, password))
+            conn.execute(sql, (fname, lname, email, hashed_password))
             conn.commit()
             conn.close()
 
@@ -280,75 +275,51 @@ def add_to_cart(soapid):
 
 
 # Completeing order route
-@app.route("/complete_order/<int:cartid>")
-def complete_order(cartid):
-    # Get the user's id
-    userid = session.get("userid")
-
-    if not userid:
-        # If there isn't a user logged in, prompt login
-        flash("Please log in to complete your order.")
-        return redirect(url_for("login"))
-
-    conn = sqlite3.connect("Soap.db")
-    # SQL query that check if the cart exists
-    sql = "SELECT * FROM Cart WHERE cartid = ? \
-        AND userid = ? AND status = 'open'"
-    cart = conn.execute(sql, (cartid, userid)).fetchone()
-
-    if not cart:
-        # If the cart doesn't exist, show error page
-        return "Cart not found", 404
-
-    # SQL query sets the status of current cart to completed
-    sql = "UPDATE Cart SET status = 'completed' WHERE cartid = ?"
-    conn.execute(sql, (cartid,))
-    conn.commit()
-    conn.close()
-
-    # Tell user order is successfully marked complete, return home.html
-    flash("Order completed")
-    return redirect(url_for("home"))
-
-
-# Previous carts route
-@app.route("/previous_carts")
-def previous_carts():
-    # Get userid
-    userid = session.get("userid")
-
-    if not userid:
-        # If there isn't a user logged in, prompt login
-        flash("Please log in to view your previous carts")
-        return redirect(url_for("login"))
-
-    conn = sqlite3.connect("Soap.db")
-    # SQL query gathers all the information from carts that are completed
-    sql = "SELECT * FROM Cart WHERE userid = ? AND status = 'completed'"
-    completed_carts = conn.execute(sql, (userid,)).fetchall()
-    conn.close()
-
-    # Return previous_carts.html, pass on completed_carts to template
-    return render_template("previous_carts.html",
-                           completed_carts=completed_carts)
-
-
-# Search route
 @app.route("/search", methods=["GET", "POST"])
 def search():
-    # Get the search term inputted by user, strip it of spaces
+    # Get the search term, filter, and sort parameters from the URL
     search_term = request.args.get("search_term", "").strip()
+    filter_option = request.args.get("filter", "").strip()
+    sort_option = request.args.get("sort", "").strip()
 
     conn = sqlite3.connect("Soap.db")
-    # SQL query for gathering results like the search term
-    sql = "SELECT * FROM Soap WHERE name LIKE ? OR description LIKE ?"
-    results = conn.execute(sql, (f"%{search_term}%",
-                                 f"%{search_term}%")).fetchall()
+
+    # Start constructing the SQL query
+    sql = "SELECT * FROM Soap WHERE name LIKE ?"
+    params = [f"%{search_term}%"]
+
+    # Apply filter if one is selected
+    if filter_option:
+        if filter_option == "bar":
+            sql += " AND type = ?"
+            params.append("Bar")
+        elif filter_option == "liquid":
+            sql += " AND type = ?"
+            params.append("Liquid")
+
+    # Apply sorting based on the selected sort option
+    if sort_option:
+        if sort_option == "relevance":
+            pass
+        elif sort_option == "ascending":
+            sql += " ORDER BY price ASC"
+        elif sort_option == "descending":
+            sql += " ORDER BY price DESC"
+        elif sort_option == "alpha":
+            sql += " ORDER BY name ASC"
+    else:
+        # Default sorting if no specific sort is selected
+        sql += " ORDER BY name ASC"
+
+    # Execute the query with the constructed SQL and parameters
+    results = conn.execute(sql, params).fetchall()
     conn.close()
 
-    # Return search.html, pass results and search_term to template
+    # Return search.html
     return render_template("search.html",
-                           results=results, search_term=search_term)
+                           results=results, search_term=search_term,
+                           filter_option=filter_option,
+                           sort_option=sort_option)
 
 
 # Decreasing quantity route
