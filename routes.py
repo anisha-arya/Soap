@@ -162,6 +162,33 @@ def update_address(userid):
     return redirect(url_for("userinfo", userid=userid))
 
 
+# Completeing order route
+@app.route("/complete_order/<int:cartid>")
+def complete_order(cartid):
+    # Get the user's id
+    userid = session.get("userid")
+    if not userid:
+        # If there isn't a user logged in, prompt login
+        flash("Please log in to complete your order.")
+        return redirect(url_for("login"))
+    conn = sqlite3.connect("Soap.db")
+    # SQL query that check if the cart exists
+    sql = "SELECT * FROM Cart WHERE cartid = ? \
+        AND userid = ? AND status = 'open'"
+    cart = conn.execute(sql, (cartid, userid)).fetchone()
+    if not cart:
+        # If the cart doesn't exist, show error page
+        return "Cart not found", 404
+    # SQL query sets the status of current cart to completed
+    sql = "UPDATE Cart SET status = 'completed' WHERE cartid = ?"
+    conn.execute(sql, (cartid,))
+    conn.commit()
+    conn.close()
+    # Tell user order is successfully marked complete, return home.html
+    flash("Order completed")
+    return redirect(url_for("home"))
+
+
 # Current cart route
 @app.route("/view_current_cart")
 def view_current_cart():
@@ -274,7 +301,7 @@ def add_to_cart(soapid):
                             search_term=request.args.get('search_term')))
 
 
-# Completeing order route
+# Search
 @app.route("/search", methods=["GET", "POST"])
 def search():
     # Get the search term, filter, and sort parameters from the URL
@@ -300,7 +327,7 @@ def search():
     # Apply sorting based on the selected sort option
     if sort_option:
         if sort_option == "relevance":
-            pass
+            sql += " ORDER BY soapid ASC"
         elif sort_option == "ascending":
             sql += " ORDER BY price ASC"
         elif sort_option == "descending":
@@ -309,7 +336,7 @@ def search():
             sql += " ORDER BY name ASC"
     else:
         # Default sorting if no specific sort is selected
-        sql += " ORDER BY name ASC"
+        sql += " ORDER BY soapid ASC"
 
     # Execute the query with the constructed SQL and parameters
     results = conn.execute(sql, params).fetchall()
