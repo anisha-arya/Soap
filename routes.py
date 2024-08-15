@@ -28,9 +28,22 @@ def inject_user_firstname():
 
 
 # Home page route
-@app.route("/")
+@app.route('/')
 def home():
-    return render_template("home.html")
+    conn = sqlite3.connect('Soap.db')
+    cursor = conn.cursor()
+
+    categories = ['liquid', 'bar', 'mint', 'on sale']
+    category_data = {}
+
+    for category in categories:
+        cursor.execute("SELECT name, picture FROM soap \
+                       WHERE type=?", (category,))
+        category_data[category] = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('home.html', category_data=category_data)
 
 
 # Login route
@@ -218,9 +231,9 @@ def view_current_cart():
         # Return home.html
         return redirect(url_for("home"))
 
-    """ SQL query that gathers all the items from the cart,
-    sums the total quantity of each item,
-    and groups the items"""
+    # SQL query that gathers all the items from the cart,
+    # sums the total quantity of each item,
+    # and groups the items
     sql = """
         SELECT Soap.soapid AS soapid,
                Soap.name AS soap_name,
@@ -239,6 +252,10 @@ def view_current_cart():
     total_price = sum(
         item[2] * item[3]
         for item in cart_items)
+
+    # Round to 2 decimal places and format as a string
+    total_price = "{:.2f}".format(round(total_price, 2))
+
     conn.close()
 
     # Return cart.html, pass on cart_items, total_price, and cartid to template
@@ -366,7 +383,7 @@ def decrease_quantity(soapid):
     cart = conn.execute(sql, (userid,)).fetchone()
 
     if cart:
-        # If there's a cart, make sure 1 instance is being referrenced
+        # If there's a cart, make sure 1 instance is being referenced
         cartid = cart[0]
 
     if not cart:

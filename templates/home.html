@@ -1,54 +1,66 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<!-- Hero Section -->
-<div class="hero-section">
-    <h1>Welcome to Soaporium</h1>
-    <p>Discover our amazing products</p>
-</div>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Soaporium{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="top-bar">
+        <a href="{{ url_for('home') }}" class="home-link">Soaporium</a>
+        <nav class="navbar">
+            <ul class="nav-links">
+                <!-- Search bar in the nav bar -->
+                <li class="search-bar">
+                    <form action="{{ url_for('search') }}" method="get">
+                        <div class="input-wrapper">
+                            <input type="text" name="search_term" placeholder="Search...">
+                            <button type="submit">Search</button>
+                        </div>
+                    </form>
+                </li>
 
-<!-- Clickable Search Items -->
-<div class="home-items">
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='mint') }}">
-            <img src="" alt="">
-            <h2>Mint</h2>
-        </a>
+                {% if session.get("userid") %}
+                <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
+                <li class="user-dropdown">
+                    <button class="user-dropdown-btn">Hi, {{ user_firstname }}</button>
+                    <ul class="dropdown-content">
+                        <li><a href="{{ url_for('userinfo', userid=session.get("userid")) }}">User Info</a></li>
+                        <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='lavender') }}">
-            <img src="" alt="">
-            <h2>Lavender</h2>
-        </a>
-    </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='shea') }}">
-            <img src="" alt="">
-            <h2>Shea</h2>
-        </a>
-    </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='charcoal') }}">
-            <img src="" alt="">
-            <h2>Charcoal</h2>
-        </a>
-    </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='citrus') }}">
-            <img src="" alt="">
-            <h2>Citrus</h2>
-        </a>
-    </div>
-</div>
 
-<!-- Flash Messages for Errors or Other Notifications -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul class="flash-messages">
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-{% endblock %}
+    <div class="content">
+        {% for category, soaps in category_data.items() %}
+            <div class="category-section">
+                <div class="category-title">{{ category | capitalize }} Soaps</div>
+                {% for soap in soaps %}
+                    <div class="soap-item">
+                        <img src="{{ url_for('static', filename=soap[1]) }}" alt="{{ soap[0] }}">
+                        <div class="soap-details">
+                            <h2>{{ soap[0] }}</h2>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="footer">
+        <div class="footer-links">
+            <a href="about.html">About Us</a>
+            <a href="faqs.html">FAQs</a>
+        </div>
+        <p>Soaporium &COPY; 2024</p>
+    </div>
+</body>
+
+</html>

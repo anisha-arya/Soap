@@ -22,7 +22,7 @@
             <h2>{{ item[1] }}</h2> <!-- Soap name -->
             <p>Quantity: {{ item[3] }}</p> <!-- Total quantity for each soap -->
             <p>Unit Price: ${{ item[2] }}</p> <!-- Unit price -->
-            <p>Total Price: ${{ item[2] * item[3] }}</p> <!-- Total price for each soap -->
+            <p>Total Price: ${{ "{:.2f}".format(item[2] * item[3]) }}</p> <!-- Total price for each soap -->
             <a href="{{ url_for('decrease_quantity', cartid=cartid, soapid=item[0] )}}">Remove one</a>
         </li>
         {% endfor %}

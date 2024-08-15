@@ -126,54 +126,82 @@ li {
 }
 
 /* Home Page Items */
-.home-items {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
+.content {
     padding: 20px;
 }
 
-.hitem {
-    width: 100%;
-    margin-bottom: 20px;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.category-title {
+    font-size: 1.8rem;
+    color: #b5446e;
+    margin-bottom: 10px;
 }
 
-.hitem a {
+.soap-item:hover {
+    transform: scale(1.02); /* Slightly scale up on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.soap-item a {
     text-decoration: none;
 }
 
-.hitem img {
-    width: 100%;
-    height: auto;
+.soap-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff; /* Ensure background color for visibility */
 }
 
-.hitem h2 {
+.soap-item img {
+    width: 30%; /* Adjust image size */
+    height: auto;
+    object-fit: cover; /* Maintain aspect ratio */
+}
+
+.soap-item .soap-details {
+    width: 65%; /* Adjust name and description container size */
     padding: 10px;
-    background-color: #f8f8f8;
+}
+
+.soap-item .soap-details h2 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.2rem; /* Adjust font size */
     color: #b5446e;
 }
 
 /* Footer */
 .footer {
     background-color: #2b3d41;
-    padding: 10px;
-    /* Adjust padding as needed */
+    padding: 20px;
     color: #faf9f9;
-    margin-top: auto;
-    /* Push the footer to the bottom */
-    flex-shrink: 0;
-    /* Ensure footer doesn't shrink */
+    margin-top: auto; /* Push the footer to the bottom */
+    flex-shrink: 0; /* Ensure footer doesn't shrink */
+    text-align: center; /* Center-align text */
+}
+
+.footer a {
+    color: #faf9f9;
+    text-decoration: none;
+    margin: 0 10px; /* Space between links */
+    font-size: 0.9rem; /* Adjust font size */
+}
+
+.footer a:hover {
+    text-decoration: underline; /* Underline on hover */
 }
 
 .footer p {
-    margin: 0;
+    margin: 10px 0; /* Space between paragraphs */
+    font-size: 0.8rem; /* Adjust font size for smaller text */
+}
+
+.footer .footer-links {
+    margin-bottom: 10px; /* Space above links */
 }
 
 /* Login and Signup Containers */
