@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Soaporium{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
@@ -11,7 +11,6 @@
         <a href="{{ url_for('home') }}" class="home-link">Soaporium</a>
         <nav class="navbar">
             <ul class="nav-links">
-                <!-- Search bar in the nav bar -->
                 <li class="search-bar">
                     <form action="{{ url_for('search') }}" method="get">
                         <div class="input-wrapper">
@@ -20,7 +19,6 @@
                         </div>
                     </form>
                 </li>
-
                 {% if session.get("userid") %}
                 <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
                 <li class="user-dropdown">
@@ -38,20 +36,17 @@
         </nav>
     </div>
 
-    <div class="content">
-        {% for category, soaps in category_data.items() %}
-            <div class="category-section">
-                <div class="category-title">{{ category | capitalize }} Soaps</div>
-                {% for soap in soaps %}
-                    <div class="soap-item">
-                        <img src="{{ url_for('static', filename=soap[1]) }}" alt="{{ soap[0] }}">
-                        <div class="soap-details">
-                            <h2>{{ soap[0] }}</h2>
-                        </div>
-                    </div>
-                {% endfor %}
+    <!-- On-sale soaps full-width gallery -->
+     <h1>Welcome to Soaporium</h1>
+     <p>Discover our amazing products</p>
+     <hr>
+     <h2>Shop on sale soaps now!</h2>
+    <div class="on-sale-gallery">
+        <div class="soap-gallery-item">
+            <div class="soap-name-overlay">
+                <h3 id="soap-name"></h3>
             </div>
-        {% endfor %}
+        </div>
     </div>
 
     <div class="footer">
@@ -61,6 +56,39 @@
         </div>
         <p>Soaporium &COPY; 2024</p>
     </div>
-</body>
+<!--ChatGPT Java-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const soaps = [
+                {% for soap in category_data['On Sale'] %}
+                    {
+                        name: "{{ soap[0]|replace('"', '\\"') }}",
+                        image: "{{ url_for('static', filename=soap[1].replace('/static/', ''))|replace('"', '\\"') }}"
+                    }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
 
+            console.log("Soaps data:", soaps); // Check generated URLs
+
+            if (soaps.length === 0) {
+                console.error("No on-sale soaps available.");
+                return;
+            }
+
+            let currentIndex = 0;
+            const soapGalleryItem = document.querySelector('.soap-gallery-item');
+            const soapName = document.getElementById('soap-name');
+
+            function updateGallery() {
+                const currentSoap = soaps[currentIndex];
+                soapGalleryItem.style.backgroundImage = `url('${currentSoap.image}')`;
+                soapName.textContent = currentSoap.name;
+                currentIndex = (currentIndex + 1) % soaps.length;
+            }
+
+            updateGallery();
+            setInterval(updateGallery, 5000);
+        });
+    </script>
+</body>
 </html>

@@ -28,20 +28,25 @@ def inject_user_firstname():
 
 
 # Home page route
-@app.route('/')
+@app.route("/")
 def home():
     conn = sqlite3.connect('Soap.db')
     cursor = conn.cursor()
 
-    categories = ['liquid', 'bar', 'mint', 'on sale']
-    category_data = {}
-
-    for category in categories:
-        cursor.execute("SELECT name, picture FROM soap \
-                       WHERE type=?", (category,))
-        category_data[category] = cursor.fetchall()
+    on_sale = cursor.execute("SELECT name, picture FROM soap\
+                             WHERE sale=1").fetchall()
+    bars = cursor.execute("SELECT name, picture FROM soap\
+                          WHERE type='bar'").fetchall()
+    liquids = cursor.execute("SELECT name, picture FROM soap\
+                             WHERE type='liquid'").fetchall()
 
     conn.close()
+
+    category_data = {
+        'On Sale': on_sale,
+        'Bar': bars,
+        'Liquid': liquids
+    }
 
     return render_template('home.html', category_data=category_data)
 
