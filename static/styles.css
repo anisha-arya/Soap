@@ -32,62 +32,6 @@ li {
     padding: 0;
 }
 
-/* Gallery styles */
-/* Gallery styles */
-.on-sale-gallery {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    height: 400px; /* Adjust as needed */
-    margin-bottom: 1em;
-}
-
-.soap-gallery-item {
-    width: 100%;
-    height: 100%;
-    background-size: cover; /* Ensures the background image covers the entire div */
-    background-position: center; /* Centers the background image */
-    background-repeat: no-repeat; /* Prevents image repetition */
-    position: relative;
-    transition: background-image 1s ease-in-out; /* Smooth transition for image change */
-    /* Darken the background image */
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark overlay */
-}
-
-/* Ensure the overlay sits on top of the background image */
-.soap-name-overlay {
-    position: absolute;
-    top: 50%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Adjust positioning to center the element */
-    color: white;
-    background-color: rgba(0, 0, 0, 0.6); /* Darker overlay for better text visibility */
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 18px; /* Smaller text size */
-    font-weight: bold; /* Makes the text stand out more */
-    text-align: center; /* Center text horizontally */
-    width: 80%; /* Optional: Adjust width as needed */
-}
-
-/* Adjust the size and positioning of the images if needed */
-.soap-gallery-item {
-    background-size: cover; /* Ensure the image covers the div */
-    background-position: center; /* Center the image */
-}
-
-.soap-name-overlay h3 {
-    margin: 0;
-    font-size: 2em; /* Adjust font size */
-}
-
-/* Fade animation */
-@keyframes fade {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-
 /* Header and Navigation */
 .top-bar {
     height: 5em;
@@ -186,47 +130,30 @@ li {
     padding: 20px;
 }
 
-.category-title {
-    font-size: 1.8rem;
-    color: #b5446e;
-    margin-bottom: 10px;
+.hitem {
+    width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.soap-item:hover {
-    transform: scale(1.02); /* Slightly scale up on hover */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
-}
-
-.soap-item a {
+.hitem a {
     text-decoration: none;
 }
 
-.soap-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: #fff; /* Ensure background color for visibility */
-}
-
-.soap-item img {
-    width: 30%; /* Adjust image size */
+.hitem img {
+    width: 100%;
     height: auto;
-    object-fit: cover; /* Maintain aspect ratio */
 }
 
-.soap-item .soap-details {
-    width: 65%; /* Adjust name and description container size */
+.hitem h2 {
     padding: 10px;
-}
-
-.soap-item .soap-details h2 {
+    background-color: #f8f8f8;
     margin: 0;
-    font-size: 1.2rem; /* Adjust font size */
+    font-size: 1.2rem;
     color: #b5446e;
 }
 

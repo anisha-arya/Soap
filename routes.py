@@ -1,7 +1,6 @@
 # Import Flask and Flask properties, sqlite3, secrets
 from flask import Flask, render_template, request, redirect, \
     url_for, flash, session
-from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import secrets
 
@@ -30,44 +29,34 @@ def inject_user_firstname():
 # Home page route
 @app.route("/")
 def home():
-    conn = sqlite3.connect('Soap.db')
-    cursor = conn.cursor()
-
-    on_sale = cursor.execute("SELECT name, picture FROM soap\
-                             WHERE sale=1").fetchall()
-    bars = cursor.execute("SELECT name, picture FROM soap\
-                          WHERE type='bar'").fetchall()
-    liquids = cursor.execute("SELECT name, picture FROM soap\
-                             WHERE type='liquid'").fetchall()
-
-    conn.close()
-
-    category_data = {
-        'On Sale': on_sale,
-        'Bar': bars,
-        'Liquid': liquids
-    }
-
-    return render_template('home.html', category_data=category_data)
+    return render_template("home.html")
 
 
 # Login route
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    user = None
+    # If a user wants to login by submitting their email and password
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
         conn = sqlite3.connect("Soap.db")
-        sql = "SELECT * FROM User WHERE email = ?"
-        user = conn.execute(sql, (email,)).fetchone()
+        # SQL to check if a user with the submitted email and password exists
+        sql = "SELECT * FROM User WHERE email = ? AND password = ?"
+        user = conn.execute(sql, (email, password)).fetchone()
         conn.close()
 
-        if user and check_password_hash(user[11], password):
-            session["userid"] = user[0]
-            return redirect(url_for("userinfo", userid=user[0]))
-        else:
-            flash("Incorrect email or password")
+    if user:
+        # If a user exists, set the sessionid to the user's id
+        session["userid"] = user[0]
+        # Return user.html, pass on the userid to template
+        return redirect(url_for("userinfo", userid=user[0]))
 
+    if not user:
+        # If a user doesn't exist tell the user something's wrong
+        flash("Login or sign up to continue")
+
+    # Return login.html
     return render_template("login.html")
 
 
@@ -81,8 +70,6 @@ def signup():
         lname = request.form["lname"]
         email = request.form["email"]
         password = request.form["password"]
-        # Hash the password
-        hashed_password = generate_password_hash(password)
 
         conn = sqlite3.connect("Soap.db")
         # SQL for checking if there's already a user with the submitted email
@@ -111,7 +98,7 @@ def signup():
                 "INSERT INTO User (fname, lname, email, password) \
                     VALUES (?, ?, ?, ?)"
                     )
-            conn.execute(sql, (fname, lname, email, hashed_password))
+            conn.execute(sql, (fname, lname, email, password))
             conn.commit()
             conn.close()
 
@@ -180,33 +167,6 @@ def update_address(userid):
     return redirect(url_for("userinfo", userid=userid))
 
 
-# Completeing order route
-@app.route("/complete_order/<int:cartid>")
-def complete_order(cartid):
-    # Get the user's id
-    userid = session.get("userid")
-    if not userid:
-        # If there isn't a user logged in, prompt login
-        flash("Please log in to complete your order.")
-        return redirect(url_for("login"))
-    conn = sqlite3.connect("Soap.db")
-    # SQL query that check if the cart exists
-    sql = "SELECT * FROM Cart WHERE cartid = ? \
-        AND userid = ? AND status = 'open'"
-    cart = conn.execute(sql, (cartid, userid)).fetchone()
-    if not cart:
-        # If the cart doesn't exist, show error page
-        return "Cart not found", 404
-    # SQL query sets the status of current cart to completed
-    sql = "UPDATE Cart SET status = 'completed' WHERE cartid = ?"
-    conn.execute(sql, (cartid,))
-    conn.commit()
-    conn.close()
-    # Tell user order is successfully marked complete, return home.html
-    flash("Order completed")
-    return redirect(url_for("home"))
-
-
 # Current cart route
 @app.route("/view_current_cart")
 def view_current_cart():
@@ -236,9 +196,9 @@ def view_current_cart():
         # Return home.html
         return redirect(url_for("home"))
 
-    # SQL query that gathers all the items from the cart,
-    # sums the total quantity of each item,
-    # and groups the items
+    """ SQL query that gathers all the items from the cart,
+    sums the total quantity of each item,
+    and groups the items"""
     sql = """
         SELECT Soap.soapid AS soapid,
                Soap.name AS soap_name,
@@ -257,10 +217,6 @@ def view_current_cart():
     total_price = sum(
         item[2] * item[3]
         for item in cart_items)
-
-    # Round to 2 decimal places and format as a string
-    total_price = "{:.2f}".format(round(total_price, 2))
-
     conn.close()
 
     # Return cart.html, pass on cart_items, total_price, and cartid to template
@@ -323,52 +279,76 @@ def add_to_cart(soapid):
                             search_term=request.args.get('search_term')))
 
 
-# Search
-@app.route("/search", methods=["GET", "POST"])
-def search():
-    # Get the search term, filter, and sort parameters from the URL
-    search_term = request.args.get("search_term", "").strip()
-    filter_option = request.args.get("filter", "").strip()
-    sort_option = request.args.get("sort", "").strip()
+# Completeing order route
+@app.route("/complete_order/<int:cartid>")
+def complete_order(cartid):
+    # Get the user's id
+    userid = session.get("userid")
+
+    if not userid:
+        # If there isn't a user logged in, prompt login
+        flash("Please log in to complete your order.")
+        return redirect(url_for("login"))
 
     conn = sqlite3.connect("Soap.db")
+    # SQL query that check if the cart exists
+    sql = "SELECT * FROM Cart WHERE cartid = ? \
+        AND userid = ? AND status = 'open'"
+    cart = conn.execute(sql, (cartid, userid)).fetchone()
 
-    # Start constructing the SQL query
-    sql = "SELECT * FROM Soap WHERE name LIKE ?"
-    params = [f"%{search_term}%"]
+    if not cart:
+        # If the cart doesn't exist, show error page
+        return "Cart not found", 404
 
-    # Apply filter if one is selected
-    if filter_option:
-        if filter_option == "bar":
-            sql += " AND type = ?"
-            params.append("Bar")
-        elif filter_option == "liquid":
-            sql += " AND type = ?"
-            params.append("Liquid")
-
-    # Apply sorting based on the selected sort option
-    if sort_option:
-        if sort_option == "relevance":
-            sql += " ORDER BY soapid ASC"
-        elif sort_option == "ascending":
-            sql += " ORDER BY price ASC"
-        elif sort_option == "descending":
-            sql += " ORDER BY price DESC"
-        elif sort_option == "alpha":
-            sql += " ORDER BY name ASC"
-    else:
-        # Default sorting if no specific sort is selected
-        sql += " ORDER BY soapid ASC"
-
-    # Execute the query with the constructed SQL and parameters
-    results = conn.execute(sql, params).fetchall()
+    # SQL query sets the status of current cart to completed
+    sql = "UPDATE Cart SET status = 'completed' WHERE cartid = ?"
+    conn.execute(sql, (cartid,))
+    conn.commit()
     conn.close()
 
-    # Return search.html
+    # Tell user order is successfully marked complete, return home.html
+    flash("Order completed")
+    return redirect(url_for("home"))
+
+
+# Previous carts route
+@app.route("/previous_carts")
+def previous_carts():
+    # Get userid
+    userid = session.get("userid")
+
+    if not userid:
+        # If there isn't a user logged in, prompt login
+        flash("Please log in to view your previous carts")
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("Soap.db")
+    # SQL query gathers all the information from carts that are completed
+    sql = "SELECT * FROM Cart WHERE userid = ? AND status = 'completed'"
+    completed_carts = conn.execute(sql, (userid,)).fetchall()
+    conn.close()
+
+    # Return previous_carts.html, pass on completed_carts to template
+    return render_template("previous_carts.html",
+                           completed_carts=completed_carts)
+
+
+# Search route
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    # Get the search term inputted by user, strip it of spaces
+    search_term = request.args.get("search_term", "").strip()
+
+    conn = sqlite3.connect("Soap.db")
+    # SQL query for gathering results like the search term
+    sql = "SELECT * FROM Soap WHERE name LIKE ? OR description LIKE ?"
+    results = conn.execute(sql, (f"%{search_term}%",
+                                 f"%{search_term}%")).fetchall()
+    conn.close()
+
+    # Return search.html, pass results and search_term to template
     return render_template("search.html",
-                           results=results, search_term=search_term,
-                           filter_option=filter_option,
-                           sort_option=sort_option)
+                           results=results, search_term=search_term)
 
 
 # Decreasing quantity route
@@ -388,7 +368,7 @@ def decrease_quantity(soapid):
     cart = conn.execute(sql, (userid,)).fetchone()
 
     if cart:
-        # If there's a cart, make sure 1 instance is being referenced
+        # If there's a cart, make sure 1 instance is being referrenced
         cartid = cart[0]
 
     if not cart:

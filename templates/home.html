@@ -1,94 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Soaporium{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <div class="top-bar">
-        <a href="{{ url_for('home') }}" class="home-link">Soaporium</a>
-        <nav class="navbar">
-            <ul class="nav-links">
-                <li class="search-bar">
-                    <form action="{{ url_for('search') }}" method="get">
-                        <div class="input-wrapper">
-                            <input type="text" name="search_term" placeholder="Search...">
-                            <button type="submit">Search</button>
-                        </div>
-                    </form>
-                </li>
-                {% if session.get("userid") %}
-                <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
-                <li class="user-dropdown">
-                    <button class="user-dropdown-btn">Hi, {{ user_firstname }}</button>
-                    <ul class="dropdown-content">
-                        <li><a href="{{ url_for('userinfo', userid=session.get("userid")) }}">User Info</a></li>
-                        <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
-                    </ul>
-                </li>
-                {% else %}
-                <li><a href="{{ url_for('login') }}">Login</a></li>
-                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
-                {% endif %}
-            </ul>
-        </nav>
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>Welcome to Soaporium</h1>
+    <p>Discover our amazing products</p>
+</div>
+
+<!-- Clickable Search Items -->
+<div class="home-items">
+    <div class="hitem">
+        <a href="{{ url_for('search', search_term='mint') }}">
+            <img src="" alt="">
+            <h2>Mint</h2>
+        </a>
     </div>
-
-    <!-- On-sale soaps full-width gallery -->
-     <h1>Welcome to Soaporium</h1>
-     <p>Discover our amazing products</p>
-     <hr>
-     <h2>Shop on sale soaps now!</h2>
-    <div class="on-sale-gallery">
-        <div class="soap-gallery-item">
-            <div class="soap-name-overlay">
-                <h3 id="soap-name"></h3>
-            </div>
-        </div>
+    <div class="hitem">
+        <a href="{{ url_for('search', search_term='lavender') }}">
+            <img src="" alt="">
+            <h2>Lavender</h2>
+        </a>
     </div>
-
-    <div class="footer">
-        <div class="footer-links">
-            <a href="about.html">About Us</a>
-            <a href="faqs.html">FAQs</a>
-        </div>
-        <p>Soaporium &COPY; 2024</p>
+    <div class="hitem">
+        <a href="{{ url_for('search', search_term='shea') }}">
+            <img src="" alt="">
+            <h2>Shea</h2>
+        </a>
     </div>
-<!--ChatGPT Java-->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const soaps = [
-                {% for soap in category_data['On Sale'] %}
-                    {
-                        name: "{{ soap[0]|replace('"', '\\"') }}",
-                        image: "{{ url_for('static', filename=soap[1].replace('/static/', ''))|replace('"', '\\"') }}"
-                    }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ];
+    <div class="hitem">
+        <a href="{{ url_for('search', search_term='charcoal') }}">
+            <img src="" alt="">
+            <h2>Charcoal</h2>
+        </a>
+    </div>
+    <div class="hitem">
+        <a href="{{ url_for('search', search_term='citrus') }}">
+            <img src="" alt="">
+            <h2>Citrus</h2>
+        </a>
+    </div>
+</div>
 
-            console.log("Soaps data:", soaps); // Check generated URLs
-
-            if (soaps.length === 0) {
-                console.error("No on-sale soaps available.");
-                return;
-            }
-
-            let currentIndex = 0;
-            const soapGalleryItem = document.querySelector('.soap-gallery-item');
-            const soapName = document.getElementById('soap-name');
-
-            function updateGallery() {
-                const currentSoap = soaps[currentIndex];
-                soapGalleryItem.style.backgroundImage = `url('${currentSoap.image}')`;
-                soapName.textContent = currentSoap.name;
-                currentIndex = (currentIndex + 1) % soaps.length;
-            }
-
-            updateGallery();
-            setInterval(updateGallery, 5000);
-        });
-    </script>
-</body>
-</html>
+<!-- Flash Messages for Errors or Other Notifications -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flash-messages">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+{% endblock %}
