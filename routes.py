@@ -1,6 +1,7 @@
 # Import Flask and Flask properties, sqlite3, secrets
 from flask import Flask, render_template, request, redirect, \
     url_for, flash, session
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import secrets
 
@@ -36,33 +37,19 @@ def home():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        email = request.form["email"]
+        password = request.form["password"]
+        conn = sqlite3.connect("Soap.db")
+        sql = "SELECT * FROM User WHERE email = ?"
+        user = conn.execute(sql, (email,)).fetchone()
+        conn.close()
 
-        try:
-            # Connect to the SQLite database
-            conn = sqlite3.connect("Soap.db")
+        if user and check_password_hash(user[11], password):
+            session["userid"] = user[0]
+            return redirect(url_for("userinfo", userid=user[0]))
+        else:
+            flash("Incorrect email or password")
 
-            # SQL query to check if the user exists
-            sql = "SELECT * FROM User WHERE email = ? AND password = ?"
-            user = conn.execute(sql, (email, password)).fetchone()
-
-            # Close the database connection
-            conn.close()
-
-            if user:
-                # If user exists, set the session ID to the user's ID
-                session["userid"] = user[0]
-                # Redirect to the user info page
-                return redirect(url_for("userinfo", userid=user[0]))
-            else:
-                # If user does not exist, flash an error message
-                flash("Login or sign up to continue")
-        except Exception:
-            # Flash an error message if an exception occurs
-            flash("An error occurred while processing your request.")
-
-    # Render the login template
     return render_template("login.html")
 
 
@@ -76,6 +63,8 @@ def signup():
         lname = request.form["lname"]
         email = request.form["email"]
         password = request.form["password"]
+        # Hash the password
+        hashed_password = generate_password_hash(password)
 
         conn = sqlite3.connect("Soap.db")
         # SQL for checking if there's already a user with the submitted email
@@ -104,7 +93,7 @@ def signup():
                 "INSERT INTO User (fname, lname, email, password) \
                     VALUES (?, ?, ?, ?)"
                     )
-            conn.execute(sql, (fname, lname, email, password))
+            conn.execute(sql, (fname, lname, email, hashed_password))
             conn.commit()
             conn.close()
 
