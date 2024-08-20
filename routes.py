@@ -35,28 +35,34 @@ def home():
 # Login route
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    user = None
-    # If a user wants to login by submitting their email and password
     if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-        conn = sqlite3.connect("Soap.db")
-        # SQL to check if a user with the submitted email and password exists
-        sql = "SELECT * FROM User WHERE email = ? AND password = ?"
-        user = conn.execute(sql, (email, password)).fetchone()
-        conn.close()
+        email = request.form.get("email")
+        password = request.form.get("password")
 
-    if user:
-        # If a user exists, set the sessionid to the user's id
-        session["userid"] = user[0]
-        # Return user.html, pass on the userid to template
-        return redirect(url_for("userinfo", userid=user[0]))
+        try:
+            # Connect to the SQLite database
+            conn = sqlite3.connect("Soap.db")
 
-    if not user:
-        # If a user doesn't exist tell the user something's wrong
-        flash("Login or sign up to continue")
+            # SQL query to check if the user exists
+            sql = "SELECT * FROM User WHERE email = ? AND password = ?"
+            user = conn.execute(sql, (email, password)).fetchone()
 
-    # Return login.html
+            # Close the database connection
+            conn.close()
+
+            if user:
+                # If user exists, set the session ID to the user's ID
+                session["userid"] = user[0]
+                # Redirect to the user info page
+                return redirect(url_for("userinfo", userid=user[0]))
+            else:
+                # If user does not exist, flash an error message
+                flash("Login or sign up to continue")
+        except Exception:
+            # Flash an error message if an exception occurs
+            flash("An error occurred while processing your request.")
+
+    # Render the login template
     return render_template("login.html")
 
 
@@ -190,11 +196,14 @@ def view_current_cart():
         cartid = cartid[0]
 
     if not cartid:
-        # If there is no cart, tell user
-        flash("No cart found")
-        conn.close()
-        # Return home.html
-        return redirect(url_for("home"))
+        # SQL query that creates an open cart if there isn't one
+        sql = """INSERT INTO Cart (userid, order_date, status)
+                VALUES (?, datetime('now'), 'open')"""
+        conn.execute(sql, (userid,))
+        conn.commit()
+        # SQL query that gets the cartid of the open cart of the user
+        sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
+        cartid = conn.execute(sql, (userid,)).fetchone()
 
     """ SQL query that gathers all the items from the cart,
     sums the total quantity of each item,
@@ -279,7 +288,7 @@ def add_to_cart(soapid):
                             search_term=request.args.get('search_term')))
 
 
-# Completeing order route
+# Complete order route
 @app.route("/complete_order/<int:cartid>")
 def complete_order(cartid):
     # Get the user's id
@@ -291,14 +300,27 @@ def complete_order(cartid):
         return redirect(url_for("login"))
 
     conn = sqlite3.connect("Soap.db")
-    # SQL query that check if the cart exists
-    sql = "SELECT * FROM Cart WHERE cartid = ? \
-        AND userid = ? AND status = 'open'"
+
+    # SQL query that checks if the cart exists and is open
+    sql = """SELECT * FROM Cart WHERE cartid = ?
+    AND userid = ? AND status = 'open'"""
     cart = conn.execute(sql, (cartid, userid)).fetchone()
 
     if not cart:
         # If the cart doesn't exist, show error page
+        conn.close()
         return "Cart not found", 404
+
+    # SQL query to check if there are any items in the cart
+    sql = "SELECT COUNT(*) FROM CartItem WHERE cartid = ?"
+    item_count = conn.execute(sql, (cartid,)).fetchone()[0]
+
+    if item_count == 0:
+        # If there are no items in the cart, inform the user
+        conn.close()
+        flash("Your cart is empty. \
+              You cannot complete an order without items.")
+        return redirect(url_for("view_current_cart"))
 
     # SQL query sets the status of current cart to completed
     sql = "UPDATE Cart SET status = 'completed' WHERE cartid = ?"
@@ -334,21 +356,51 @@ def previous_carts():
 
 
 # Search route
-@app.route("/search", methods=["GET", "POST"])
+@app.route("/search")
 def search():
-    # Get the search term inputted by user, strip it of spaces
+    # Get the search term, filter, and sort parameters from the URL
     search_term = request.args.get("search_term", "").strip()
+    filter_option = request.args.get("filter", "").strip()
+    sort_option = request.args.get("sort", "").strip()
 
     conn = sqlite3.connect("Soap.db")
-    # SQL query for gathering results like the search term
-    sql = "SELECT * FROM Soap WHERE name LIKE ? OR description LIKE ?"
-    results = conn.execute(sql, (f"%{search_term}%",
-                                 f"%{search_term}%")).fetchall()
+
+    # Start constructing the SQL query
+    sql = "SELECT * FROM Soap WHERE name LIKE ?"
+    params = [f"%{search_term}%"]
+
+    # Apply filter if one is selected
+    if filter_option:
+        if filter_option == "bar":
+            sql += " AND type = ?"
+            params.append("Bar")
+        elif filter_option == "liquid":
+            sql += " AND type = ?"
+            params.append("Liquid")
+
+    # Apply sorting based on the selected sort option
+    if sort_option:
+        if sort_option == "relevance":
+            sql += " ORDER BY soapid ASC"
+        elif sort_option == "ascending":
+            sql += " ORDER BY price ASC"
+        elif sort_option == "descending":
+            sql += " ORDER BY price DESC"
+        elif sort_option == "alpha":
+            sql += " ORDER BY name ASC"
+    else:
+        # Default sorting if no specific sort is selected
+        sql += " ORDER BY soapid ASC"
+
+    # Execute the query with the constructed SQL and parameters
+    results = conn.execute(sql, params).fetchall()
     conn.close()
 
-    # Return search.html, pass results and search_term to template
+    # Return search.html
     return render_template("search.html",
-                           results=results, search_term=search_term)
+                           results=results, search_term=search_term,
+                           filter_option=filter_option,
+                           sort_option=sort_option)
 
 
 # Decreasing quantity route
@@ -372,10 +424,14 @@ def decrease_quantity(soapid):
         cartid = cart[0]
 
     if not cart:
-        # If there isn't a cart, tell user
-        flash("No open cart found")
-        conn.close()
-        return redirect(url_for("home"))
+        # SQL query that creates an open cart if there isn't one
+        sql = """INSERT INTO Cart (userid, order_date, status)
+                VALUES (?, datetime('now'), 'open')"""
+        conn.execute(sql, (userid,))
+        conn.commit()
+        # SQL query that gets the cartid of the open cart of the user
+        sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
+        cart = conn.execute(sql, (userid,)).fetchone()
 
     # SQL query gathers information about a specific item in cart
     sql = "SELECT * FROM CartItem WHERE cartid = ? AND soapid = ?"
@@ -405,6 +461,16 @@ def decrease_quantity(soapid):
     # Tell user cart is successfully updated, return cart.html
     flash("Cart updated")
     return redirect(url_for("view_current_cart"))
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
+@app.route("/faqs")
+def faqs():
+    return render_template("faqs.html")
 
 
 if __name__ == "__main__":

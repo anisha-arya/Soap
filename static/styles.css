@@ -490,6 +490,38 @@ hr {
     background-color: #ddd;
 }
 
+/* General Styles for About and FAQs */
+.about-page h1, .faqs-page h1 {
+    font-size: 2.5em;
+    color: #333;
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.about-page h2, .faqs-page h2 {
+    font-family: 'Lora', serif;
+    font-size: 1.75em;
+    text-align: center;
+    color: #555;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.about-page p, .faqs-page p {
+    font-size: 1.2em;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1em;
+    text-align: justify;
+}
+
+/* Specific Page Styling */
+.about-page p, .faqs-page p {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
 /* Responsive Design */
 @media (min-width: 1030px) {
     .results-list {
