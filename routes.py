@@ -53,16 +53,23 @@ def login():
     return render_template("login.html")
 
 
-# Signup route
+# Sign up route
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     """ If a user wants to signup, get them to submit their firstname,
-    lastname, email, and password (not null values of the User table)"""
+    lastname, email, password, and confirm password """
     if request.method == "POST":
         fname = request.form["fname"]
         lname = request.form["lname"]
         email = request.form["email"]
         password = request.form["password"]
+        confirm_password = request.form["confirm-password"]
+
+        # Check if passwords match
+        if password != confirm_password:
+            flash("Passwords do not match. Please try again.", 'error')
+            return redirect(url_for('signup'))
+
         # Hash the password
         hashed_password = generate_password_hash(password)
 
@@ -74,33 +81,33 @@ def signup():
         if existing_user:
             conn.close()
             # If there is an existing user, tell the user
-            flash("Email unavailable. Please choose another email or log in.")
+            flash("Email unavailable.\
+                  Please choose another email or log in.", 'error')
             # Return signup.html
-            return render_template("signup.html")
+            return redirect(url_for('signup'))
 
-        if not existing_user:
-            if len(fname) < 2 or len(fname) > 50 or\
-                    len(lname) < 2 or len(lname) > 50:
-                flash('Name must be between 2 and 50 characters', 'error')
-                return redirect(url_for('signup'))
+        if len(fname) < 2 or len(fname) > 50 or\
+                len(lname) < 2 or len(lname) > 50:
+            flash('Name must be between 2 and 50 characters', 'error')
+            return redirect(url_for('signup'))
 
-            if len(password) < 8 or len(password) > 100 or\
-                    len(email) < 8 or len(email) > 100:
-                flash('Password must be between 8 and 100 characters', 'error')
-                return redirect(url_for('signup'))
+        if len(password) < 8 or len(password) > 100 or\
+                len(email) < 8 or len(email) > 100:
+            flash('Password must be between 8 and 100 characters', 'error')
+            return redirect(url_for('signup'))
 
-            sql = (
-                "INSERT INTO User (fname, lname, email, password) \
-                    VALUES (?, ?, ?, ?)"
-                    )
-            conn.execute(sql, (fname, lname, email, hashed_password))
-            conn.commit()
-            conn.close()
+        sql = (
+            "INSERT INTO User (fname, lname, email, password) \
+                VALUES (?, ?, ?, ?)"
+        )
+        conn.execute(sql, (fname, lname, email, hashed_password))
+        conn.commit()
+        conn.close()
 
-            # Tell user signup is successful, and login
-            flash("Thanks for signing up!")
-            # Return login.html
-            return redirect(url_for("login"))
+        # Tell user signup is successful, and login
+        flash("Thanks for signing up!")
+        # Redirect to login.html
+        return redirect(url_for("login"))
 
     # Return signup.html
     return render_template("signup.html")
@@ -193,10 +200,11 @@ def view_current_cart():
         # SQL query that gets the cartid of the open cart of the user
         sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
         cartid = conn.execute(sql, (userid,)).fetchone()
+        cartid = cartid[0]
 
-    """ SQL query that gathers all the items from the cart,
-    sums the total quantity of each item,
-    and groups the items"""
+    # SQL query that gathers all the items from the cart,
+    # sums the total quantity of each item,
+    # and groups the items
     sql = """
         SELECT Soap.soapid AS soapid,
                Soap.name AS soap_name,
@@ -256,6 +264,9 @@ def add_to_cart(soapid):
     # Is currently in the cart
     sql = "SELECT quantity FROM CartItem WHERE cartid = ? AND soapid = ?"
     existing_item = conn.execute(sql, (cart[0], soapid)).fetchone()
+    sql = "SELECT name FROM Soap WHERE soapid = ?"
+    soap_name = conn.execute(sql, (soapid,)).fetchone()
+    soap_name = soap_name[0]
 
     if existing_item:
         # If there is already that item in the cart, update the quantity by +1
@@ -272,7 +283,7 @@ def add_to_cart(soapid):
     conn.close()
 
     # Tell user item has been successfully added, return cart.html
-    flash(f'Item {soapid} added to cart', 'success')
+    flash(f'{soap_name} added to cart', 'success')
     return redirect(url_for('search',
                             search_term=request.args.get('search_term')))
 
@@ -318,7 +329,7 @@ def complete_order(cartid):
     conn.close()
 
     # Tell user order is successfully marked complete, return home.html
-    flash("Order completed")
+    flash("Order completed!")
     return redirect(url_for("home"))
 
 
