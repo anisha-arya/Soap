@@ -1,6 +1,8 @@
 <!-- templates/cart.html -->
 {% extends "layout.html" %}
 
+{% block title %}Cart | Soaporium{% endblock %}
+
 {% block content %}
 <!-- Flash Messages for Errors or Other Notifications -->
 {% with messages = get_flashed_messages() %}
@@ -36,8 +38,9 @@
 
     <!-- Navigation links -->
     <div class="cart-navigation">
-        <a href="{{ url_for('complete_order', cartid=cartid) }}">Complete order</a>
-        <a href="{{ url_for('home') }}">Back to Home</a>
+        <a href="{{ url_for('complete_order', cartid=cartid) }}"><button>Complete order</button></a>
+        <a href="{{ url_for('previous_carts') }}"><button>View previous carts</button></a>
+        <a href="{{ url_for('home') }}"><button>Back to home</button></a>
     </div>
 </div>
 {% endblock %}

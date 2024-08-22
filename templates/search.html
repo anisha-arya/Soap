@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 
+{% block title %}Search Results | Soaporium{% endblock %}
+
 {% block content %}
 <div class="search-results-container">
     <h1>Search Results</h1>
@@ -75,13 +77,13 @@
             <!-- Flash Message for Specific Soap -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-            <ul class="flash-messages">
                 {% for category, message in messages %}
-                {% if 'Item ' ~ item[0] ~ ' added to cart' in message %}
-                <li class="{{ category }}">{{ message }}</li>
-                {% endif %}
+                    {% if item[1] in message %}
+                        <ul class="flash-messages">
+                            <li class="{{ category }}">{{ message }}</li>
+                        </ul>
+                    {% endif %}
                 {% endfor %}
-            </ul>
             {% endif %}
             {% endwith %}
 

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Sign Up{% endblock %}
+{% block title %}Sign Up | Soaporium{% endblock %}
 
 {% block content %}
 <div class="signup-container">
@@ -27,14 +27,19 @@
             <input type="password" id="password" name="password" required>
         </div>
 
-        <button type="submit">Sign Up</button>
+        <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" name="confirm-password" required>
+        </div>
+
+        <button class="login-submit" type="submit">Sign Up</button>
     </form>
 
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
     <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
