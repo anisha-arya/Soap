@@ -72,23 +72,26 @@
                 <h2>{{ item[1] }}</h2> <!-- Soap name -->
                 <p class="description">{{ item[2] }}</p> <!-- Soap description -->
                 <p class="price">${{ item[4] }}</p> <!-- Soap price -->
+                <!-- Form to add the item to the cart -->
+                <form action="{{ url_for('add_to_cart') }}" method="POST">
+                    <input type="hidden" name="soapid" value="{{ item[0] }}">
+                    <input type="hidden" name="redirect_url" value="{{ request.url }}">
+                    <button type="submit" class="add-to-cart">Add to Cart</button>
+                </form>
             </div>
 
             <!-- Flash Message for Specific Soap -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                    {% if item[1] in message %}
-                        <ul class="flash-messages">
-                            <li class="{{ category }}">{{ message }}</li>
-                        </ul>
-                    {% endif %}
-                {% endfor %}
+            {% for category, message in messages %}
+            {% if item[1] in message %}
+            <ul class="flash-messages">
+                <li class="{{ category }}">{{ message }}</li>
+            </ul>
+            {% endif %}
+            {% endfor %}
             {% endif %}
             {% endwith %}
-
-            <a href="{{ url_for('add_to_cart', soapid=item[0]) }}" class="add-to-cart">Add to Cart</a>
-            <!-- Use soapid for adding to cart -->
             <hr>
         </li>
         {% endfor %}

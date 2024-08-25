@@ -276,7 +276,7 @@ def add_to_cart():
     conn.close()
 
     flash(f'{soap_name} added to cart', 'success')
-    return redirect(redirect_url or url_for('home'))
+    return redirect(redirect_url or url_for('search'))
 
 
 # Complete order route
