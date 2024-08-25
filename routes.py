@@ -235,33 +235,28 @@ def view_current_cart():
 
 
 # Add to cart route
-@app.route("/add_to_cart/<int:soapid>")
-def add_to_cart(soapid):
-    # Get the user's id
+@app.route("/add_to_cart", methods=["POST"])
+def add_to_cart():
     userid = session.get("userid")
-
     if not userid:
-        # If there isn't a user logged in, flash message prompting login
         flash("Please log in to add items to your cart")
         return redirect(url_for("login"))
 
+    soapid = request.form.get("soapid")
+    redirect_url = request.form.get("redirect_url")
+
     conn = sqlite3.connect("Soap.db")
-    # SQL query that gets the cartid of the open cart of the user
     sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
     cart = conn.execute(sql, (userid,)).fetchone()
 
     if not cart:
-        # SQL query that creates an open cart if there isn't one
         sql = """INSERT INTO Cart (userid, order_date, status)
                 VALUES (?, datetime('now'), 'open')"""
         conn.execute(sql, (userid,))
         conn.commit()
-        # SQL query that gets the cartid of the open cart of the user
         sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
         cart = conn.execute(sql, (userid,)).fetchone()
 
-    # SQL query that checks how many of the selected item
-    # Is currently in the cart
     sql = "SELECT quantity FROM CartItem WHERE cartid = ? AND soapid = ?"
     existing_item = conn.execute(sql, (cart[0], soapid)).fetchone()
     sql = "SELECT name FROM Soap WHERE soapid = ?"
@@ -269,12 +264,10 @@ def add_to_cart(soapid):
     soap_name = soap_name[0]
 
     if existing_item:
-        # If there is already that item in the cart, update the quantity by +1
         new_quantity = int(existing_item[0]) + 1
         sql = """UPDATE CartItem SET quantity = ?
             WHERE cartid = ? AND soapid = ?"""
         conn.execute(sql, (new_quantity, cart[0], soapid))
-    # Otherwise just add the item to cart with quantity 1
     else:
         sql = """INSERT INTO CartItem (cartid, soapid, quantity)
             VALUES (?, ?, 1)"""
@@ -282,10 +275,8 @@ def add_to_cart(soapid):
     conn.commit()
     conn.close()
 
-    # Tell user item has been successfully added, return cart.html
     flash(f'{soap_name} added to cart', 'success')
-    return redirect(url_for('search',
-                            search_term=request.args.get('search_term')))
+    return redirect(redirect_url or url_for('home'))
 
 
 # Complete order route
@@ -333,24 +324,63 @@ def complete_order(cartid):
     return redirect(url_for("home"))
 
 
-# Previous carts route
-@app.route("/previous_carts")
-def previous_carts():
-    # Get userid
+@app.route("/view_previous_order/<int:cartid>")
+def view_previous_order(cartid):
     userid = session.get("userid")
 
     if not userid:
-        # If there isn't a user logged in, prompt login
+        flash("Please log in to view your previous order")
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("Soap.db")
+
+    # Check if the cart belongs to the user and is completed
+    sql = "SELECT status FROM Cart WHERE cartid = ? AND userid = ?"
+    result = conn.execute(sql, (cartid, userid)).fetchone()
+
+    if not result or result[0] != 'completed':
+        flash("You are not authorized to view\
+              this order or it does not exist.")
+        return redirect(url_for("previous_carts"))
+
+    # SQL query to gather the cart items
+    sql = """
+        SELECT Soap.soapid AS soapid,
+               Soap.name AS soap_name,
+               Soap.price AS unit_price,
+               CartItem.quantity AS soap_quantity,
+               CartItem.soapid,
+               SUM(CartItem.quantity) AS total_quantity
+        FROM CartItem
+        JOIN Soap ON Soap.soapid = CartItem.soapid
+        WHERE CartItem.cartid = ?
+        GROUP BY CartItem.soapid
+        """
+    cart_items = conn.execute(sql, (cartid,)).fetchall()
+    total_price = sum(item[2] * item[3] for item in cart_items)
+    conn.close()
+
+    return render_template(
+        "view_previous_order.html",  # This is the new template name
+        cart_items=cart_items,
+        total_price=total_price,
+        cartid=cartid
+    )
+
+
+@app.route("/previous_carts")
+def previous_carts():
+    userid = session.get("userid")
+
+    if not userid:
         flash("Please log in to view your previous carts")
         return redirect(url_for("login"))
 
     conn = sqlite3.connect("Soap.db")
-    # SQL query gathers all the information from carts that are completed
     sql = "SELECT * FROM Cart WHERE userid = ? AND status = 'completed'"
     completed_carts = conn.execute(sql, (userid,)).fetchall()
     conn.close()
 
-    # Return previous_carts.html, pass on completed_carts to template
     return render_template("previous_carts.html",
                            completed_carts=completed_carts)
 

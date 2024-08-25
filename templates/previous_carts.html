@@ -14,7 +14,7 @@
         <br>
         Order Date: {{ cart[2] }}
         <br>
-        <a href="">View contents</a>
+        <a href="{{ url_for('view_previous_order', cartid=cart[0]) }}">View contents</a>
         <br>
         <br>
     </li>

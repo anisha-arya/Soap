@@ -1,0 +1,51 @@
+<!-- templates/view_previous_order.html -->
+{% extends "layout.html" %}
+
+{% block title %}Order Details | Soaporium{% endblock %}
+
+{% block content %}
+<!-- Flash Messages for Errors or Other Notifications -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flash-messages">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<div class="cart-container">
+    <h1>Order Details</h1>
+
+    {% if cart_items and cart_items|length > 0 %}
+    <ul>
+        {% for item in cart_items %}
+        <li class="cart-item">
+            <h2>{{ item[1] }}</h2> <!-- Soap name -->
+            <p>Quantity: {{ item[3] }}</p> <!-- Total quantity for each soap -->
+            <p>Unit Price: ${{ item[2] }}</p> <!-- Unit price -->
+            <p>Total Price: ${{ "{:.2f}".format(item[2] * item[3]) }}</p> <!-- Total price for each soap -->
+
+            <!-- Form to add item to cart -->
+            <form action="{{ url_for('add_to_cart') }}" method="POST">
+                <input type="hidden" name="soapid" value="{{ item[0] }}">
+                <input type="hidden" name="redirect_url" value="{{ request.url }}">
+                <button type="submit">Add to Cart</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <p class="total-price">Total Price: ${{ total_price }}</p> <!-- Total price for the entire order -->
+
+    {% else %}
+    <p>No items found in this order.</p>
+    {% endif %}
+
+    <!-- Navigation links -->
+    <div class="cart-navigation">
+        <a href="{{ url_for('previous_carts') }}"><button>Back to previous orders</button></a>
+        <a href="{{ url_for('home') }}"><button>Back to home</button></a>
+    </div>
+</div>
+{% endblock %}
