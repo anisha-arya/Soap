@@ -42,21 +42,28 @@ li {
     margin: 5px;
     border-radius: 5px;
     opacity: 1;
-    animation: fadeOut 3s ease-out forwards; /* Apply fade-out animation */
+    animation: fadeOut 3s ease-out forwards;
+    /* Apply fade-out animation */
 }
 
 .flash-messages li.success {
-    background-color: #d4edda; /* Light green */
-    color: #155724; /* Dark green */
-    border: 1px solid #c3e6cb; /* Darker green */
+    background-color: #d4edda;
+    /* Light green */
+    color: #155724;
+    /* Dark green */
+    border: 1px solid #c3e6cb;
+    /* Darker green */
     padding: 10px;
     margin-bottom: 10px;
 }
 
 .flash-messages li.error {
-    background-color: #f8d7da; /* Light red */
-    color: #721c24; /* Dark red */
-    border: 1px solid #f5c6cb; /* Darker red */
+    background-color: #f8d7da;
+    /* Light red */
+    color: #721c24;
+    /* Dark red */
+    border: 1px solid #f5c6cb;
+    /* Darker red */
     padding: 10px;
     margin-bottom: 10px;
 }
@@ -66,12 +73,15 @@ li {
     0% {
         opacity: 1;
     }
+
     80% {
         opacity: 1;
     }
+
     100% {
         opacity: 0;
-        display: none; /* Ensure element is not visible and doesn't take space */
+        display: none;
+        /* Ensure element is not visible and doesn't take space */
     }
 }
 
@@ -552,14 +562,17 @@ hr {
     font-style: italic;
 }
 
-.back-to-home {
+.back-to-home,
+.clear-filters a {
     color: #b5446e;
     display: block;
-    margin-top: 25px;
+    margin-top: 15px;
+    margin-bottom: 5px;
     text-decoration: none;
 }
 
-.back-to-home:hover {
+.back-to-home:hover,
+.clear-filters a:hover {
     text-decoration: underline;
 }
 
@@ -601,7 +614,8 @@ hr {
 }
 
 /* General Styles for About and FAQs */
-.about-page h1, .faqs-page h1 {
+.about-page h1,
+.faqs-page h1 {
     font-size: 2.5em;
     color: #333;
     text-align: center;
@@ -609,7 +623,8 @@ hr {
     margin-bottom: 1em;
 }
 
-.about-page h2, .faqs-page h2 {
+.about-page h2,
+.faqs-page h2 {
     font-family: 'Lora', serif;
     font-size: 1.75em;
     text-align: center;
@@ -618,7 +633,8 @@ hr {
     margin-bottom: 0.5em;
 }
 
-.about-page p, .faqs-page p {
+.about-page p,
+.faqs-page p {
     font-size: 1.2em;
     color: #2b3d41;
     line-height: 1.6;
@@ -627,7 +643,8 @@ hr {
 }
 
 /* Specific Page Styling */
-.about-page p, .faqs-page p {
+.about-page p,
+.faqs-page p {
     max-width: 800px;
     margin: 0 auto;
 }
