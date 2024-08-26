@@ -1,11 +1,11 @@
 <!-- templates/user_info.html -->
 {% extends "layout.html" %}
 
-{% block title %}Your Information | Soaporium{% endblock %}
+{% block title %}My Account | Soaporium{% endblock %}
 
 {% block content %}
 <div class="user-info-container">
-    <h1>User Information</h1>
+    <h1>My Account</h1>
 
     {% if user %}
     <p><strong>First Name:</strong> {{ user[1] }}</p>
@@ -31,7 +31,7 @@
         <label for="suburb">Suburb</label>
         <input type="text" id="suburb" name="suburb" value="{{ user[5] or '' }}">
 
-        <label for="town">Town</label>
+        <label for="town">Town/City</label>
         <input type="text" id="town" name="town" value="{{ user[6] or '' }}">
 
         <label for="region">Region</label>
