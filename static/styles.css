@@ -553,19 +553,14 @@ hr {
 }
 
 .back-to-home {
-    color: #f8f8f8;
-    padding: 5px 10px;
+    color: #b5446e;
     display: block;
     margin-top: 25px;
     text-decoration: none;
-    max-width: 15%;
-    text-align: center;
-    background-color: #b5446e;
-    border-radius: 3px;
 }
 
 .back-to-home:hover {
-    background-color: #eacbd2;
+    text-decoration: underline;
 }
 
 .filter-dropdown,
@@ -625,7 +620,7 @@ hr {
 
 .about-page p, .faqs-page p {
     font-size: 1.2em;
-    color: #666;
+    color: #2b3d41;
     line-height: 1.6;
     margin-bottom: 1em;
     text-align: justify;
@@ -635,6 +630,42 @@ hr {
 .about-page p, .faqs-page p {
     max-width: 800px;
     margin: 0 auto;
+}
+
+.contact-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.contact-form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.contact-form-container input,
+.contact-form-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.contact-form-container .submit-button {
+    background-color: #b5446e;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.contact-form-container .submit-button:hover {
+    background-color: #f5c6cb;
 }
 
 /* Responsive Design */
