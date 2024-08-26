@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}Update {{ field.replace('_', ' ').title() }} | Soaporium{% endblock %}
+
+{% block content %}
+<div class="update-info-container">
+    <h2>Update {{ field.replace('_', ' ').title() }}</h2>
+    <form method="POST">
+        <label for="{{ field }}">{{ field.replace('_', ' ').title() }}</label>
+        <input type="text" id="{{ field }}" name="{{ field }}" required>
+
+        <button type="submit" class="update-button">Update {{ field.replace('_', ' ').title() }}</button>
+    </form>
+    <a href="{{ url_for('userinfo', userid=userid) }}"><button type="button">Cancel</button></a>
+</div>
+{% endblock %}
