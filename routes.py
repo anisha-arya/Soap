@@ -552,6 +552,76 @@ def decrease_quantity(soapid):
     return redirect(url_for("view_current_cart"))
 
 
+# Updating info route
+@app.route('/update_info/<field>', methods=['GET', 'POST'])
+def update_info(field):
+    userid = session.get('userid')
+
+    if not userid:
+        flash("Please log in to manage your account.", "warning")
+        return redirect(url_for('login'))
+
+    valid_fields = {
+        'fname': 'First Name',
+        'lname': 'Last Name',
+        'email': 'Email',
+        'password': 'Password',
+    }
+
+    if field not in valid_fields:
+        flash("Invalid field specified.", "danger")
+        return redirect(url_for('userinfo', userid=userid))
+
+    if request.method == 'POST':
+        new_value = request.form.get(field)
+
+        if new_value:
+            conn = sqlite3.connect('Soap.db')
+            cursor = conn.cursor()
+
+            # Special handling for password (if applicable)
+            if field == 'password':
+                new_value = generate_password_hash(new_value)
+
+            cursor.execute(f"UPDATE User SET {field} = ? WHERE userid = ?",
+                           (new_value, userid))
+            conn.commit()
+            conn.close()
+
+            flash(f"{valid_fields[field]} updated successfully.", "success")
+            return redirect(url_for('userinfo', userid=userid))
+
+    return render_template('update_info.html', field=field, userid=userid)
+
+
+# Delete account route
+@app.route('/delete_account', methods=['GET', 'POST'])
+def delete_account():
+    userid = session.get('userid')
+
+    if not userid:
+        flash("Please log in to manage your account.", "warning")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # Delete the user's account from the database
+        conn = sqlite3.connect('Soap.db')
+        cursor = conn.cursor()
+
+        # Delete the user from the User table
+        cursor.execute("DELETE FROM User WHERE userid = ?", (userid,))
+        conn.commit()
+        conn.close()
+
+        # Clear the session after account deletion
+        session.clear()
+        flash("Your account has been successfully deleted.", "success")
+        return redirect(url_for('home'))
+
+    # If GET request, render the confirmation page
+    return render_template('delete_account.html', userid=userid)
+
+
 @app.route("/about")
 def about():
     return render_template("about.html")
