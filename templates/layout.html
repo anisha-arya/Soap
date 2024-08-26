@@ -22,6 +22,8 @@
                         </div>
                     </form>
                 </li>
+                <li><a href="{{ url_for('customer_service') }}">Contact</a></li>
+
 
                 {% if session.get("userid") %}
                 <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
