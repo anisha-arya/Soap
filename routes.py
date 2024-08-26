@@ -163,11 +163,11 @@ def update_address(userid):
     postcode = request.form["postcode"]
 
     if len(housenum) < 0 or len(housenum) > 10 or\
-            len(street) < 5 or len(street) > 20 or\
-            len(suburb) < 5 or len(suburb) > 20 or\
-            len(town) < 5 or len(town) > 20 or\
-            len(region) < 5 or len(region) > 20 or\
-            len(country) < 5 or len(country) > 20 or\
+            len(street) < 5 or len(street) > 50 or\
+            len(suburb) < 5 or len(suburb) > 50 or\
+            len(town) < 5 or len(town) > 50 or\
+            len(region) < 5 or len(region) > 50 or\
+            len(country) < 3 or len(country) > 50 or\
             len(postcode) < 4 or len(postcode) > 10:
         flash('Something went wrong, please try again soon', 'error')
         return redirect(url_for('userinfo', userid=userid))
