@@ -5,12 +5,13 @@
 {% block content %}
 <div class="update-info-container">
     <h2>Update {{ field.replace('_', ' ').title() }}</h2>
-    <form method="POST">
+    <form method="POST" class="update-form">
         <label for="{{ field }}">{{ field.replace('_', ' ').title() }}</label>
         <input type="text" id="{{ field }}" name="{{ field }}" required>
 
         <button type="submit" class="update-button">Update {{ field.replace('_', ' ').title() }}</button>
     </form>
-    <a href="{{ url_for('userinfo', userid=userid) }}"><button type="button">Cancel</button></a>
+    <br>
+    <a href="{{ url_for('userinfo', userid=userid) }}"><button type="button" class="cancel-button">Cancel</button></a>
 </div>
 {% endblock %}
