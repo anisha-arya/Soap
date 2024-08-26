@@ -574,9 +574,17 @@ hr {
 
 .back-to-home,
 .clear-filters a,
-.update-link,
 .delete-account-link {
     color: #b5446e;
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    text-decoration: none;
+    max-width: 25%;
+}
+
+.update-link {
+    color: #98c1d9;
     display: block;
     margin-top: 15px;
     margin-bottom: 5px;

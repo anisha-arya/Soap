@@ -19,18 +19,18 @@
                     <form action="{{ url_for('search') }}" method="get">
                         <div class="input-wrapper">
                             <input type="text" name="search_term" placeholder="Search...">
-                            <button type="submit">Search</button>
+                            <button type="submit"><i class="fa fa-search"></i></button>
                         </div>
                     </form>
                 </li>
 
                 {% if session.get("userid") %}
-                <li><a href="{{ url_for('view_current_cart') }}">Cart</a></li>
+                <li><a href="{{ url_for('view_current_cart') }}"><i class="fa fa-shopping-cart"></i> Cart</a></li>
                 <li class="user-dropdown">
                     <button class="user-dropdown-btn">Hi, {{ user_firstname }}</button>
                     <ul class="dropdown-content">
                         <li><a href="{{ url_for('userinfo', userid=session.get('userid')) }}">My account</a></li>
-                        <li><a href="{{ url_for('logout') }}"><i class="fa fa-sign-out"></i>Sign
+                        <li><a href="{{ url_for('logout') }}"><i class="fa fa-sign-out"></i> Sign
                                 Out</a></li>
                     </ul>
                 </li>
