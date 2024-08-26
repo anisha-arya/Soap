@@ -418,6 +418,7 @@ button[type="submit"]:hover {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+    text-align: center;
 }
 
 .user-info-container h1 {
@@ -562,17 +563,31 @@ hr {
     font-style: italic;
 }
 
+.update-links-p {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows the links to wrap to the next line if needed */
+    gap: 10px;
+    /* Adjust spacing between links if necessary */
+    justify-content: center;
+}
+
 .back-to-home,
-.clear-filters a {
+.clear-filters a,
+.update-link,
+.delete-account-link {
     color: #b5446e;
     display: block;
     margin-top: 15px;
     margin-bottom: 5px;
     text-decoration: none;
+    max-width: 25%;
 }
 
 .back-to-home:hover,
-.clear-filters a:hover {
+.clear-filters a:hover,
+.update-link:hover,
+.delete-account-link:hover {
     text-decoration: underline;
 }
 

@@ -136,7 +136,7 @@ def userinfo(userid):
     session_userid = session.get("userid")
     if session_userid != userid:
         # If a user is trying to access another user's info by manual URL,
-        return "Hacker error", 404
+        return 404
     conn = sqlite3.connect("Soap.db")
     # SQL query that gathers all the user's data
     sql = "SELECT * FROM User WHERE userid = ?"
