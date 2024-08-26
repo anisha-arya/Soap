@@ -44,6 +44,11 @@ def login():
         user = conn.execute(sql, (email,)).fetchone()
         conn.close()
 
+        if len(email) < 2 or len(email) > 50 or\
+                len(password) < 2 or len(password) > 50:
+            flash('Something went wrong, please try again soon', 'error')
+            return redirect(url_for('login'))
+
         if user and check_password_hash(user[11], password):
             session["userid"] = user[0]
             return redirect(url_for("userinfo", userid=user[0]))
@@ -157,6 +162,16 @@ def update_address(userid):
     country = request.form["country"]
     postcode = request.form["postcode"]
 
+    if len(housenum) < 0 or len(housenum) > 10 or\
+            len(street) < 5 or len(street) > 20 or\
+            len(suburb) < 5 or len(suburb) > 20 or\
+            len(town) < 5 or len(town) > 20 or\
+            len(region) < 5 or len(region) > 20 or\
+            len(country) < 5 or len(country) > 20 or\
+            len(postcode) < 4 or len(postcode) > 10:
+        flash('Something went wrong, please try again soon', 'error')
+        return redirect(url_for('userinfo', userid=userid))
+
     conn = sqlite3.connect("Soap.db")
     sql = "UPDATE User SET housenum = ?, street = ?, suburb = ?, town = ?,\
         region = ?, country = ?, postcode = ? WHERE userid = ?"
@@ -167,6 +182,50 @@ def update_address(userid):
 
     flash("Address updated successfully")
     return redirect(url_for("userinfo", userid=userid))
+
+
+# Contact route
+@app.route("/customer_service", methods=["GET", "POST"])
+def customer_service():
+    if request.method == "POST":
+        # Get form data
+        name = request.form.get("name")
+        email = request.form.get("email")
+        subject = request.form.get("subject")
+        message = request.form.get("message")
+
+        # Validate the form data (you can expand this as needed)
+        if not name or not email or not subject or not message:
+            flash("All fields are required.", "error")
+            return redirect(url_for("customer_service"))
+
+        if len(name) < 2 or len(name) > 50 or\
+                len(email) < 2 or len(email) > 50 or\
+                len(subject) < 2 or len(subject) > 50 or\
+                len(message) < 2 or len(message) > 500:
+            flash('Something went wrong, please try again soon', 'error')
+            return redirect(url_for('customer_service'))
+
+        # Connect to the database
+        conn = sqlite3.connect("Soap.db")
+        cursor = conn.cursor()
+
+        # Insert the form data into the CustomerServiceRequest table
+        sql = """
+        INSERT INTO CustomerServiceRequest
+        (name, email, subject, message)
+        VALUES (?, ?, ?, ?, ?)
+        """
+        cursor.execute(sql, (name, email, subject, message))
+        conn.commit()
+        conn.close()
+
+        # Flash a success message and redirect to the same page or another page
+        flash("Your request has been submitted successfully.", "success")
+        return redirect(url_for("customer_service"))
+
+    # If the request method is GET, render the customer service form
+    return render_template("contact.html")
 
 
 # Current cart route
