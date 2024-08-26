@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}Confirm Account Deletion | Soaporium{% endblock %}
+
+{% block content %}
+<div class="delete-confirmation">
+    <h2>Are you sure you want to delete your account?</h2>
+    <form method="POST">
+        <button type="submit" class="confirm-delete-button">Yes, delete my account</button>
+        <a href="{{ url_for('userinfo', userid=userid) }}"><button type="button">No, take me back</button></a>
+    </form>
+</div>
+{% endblock %}
