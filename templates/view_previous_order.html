@@ -30,7 +30,7 @@
             <form action="{{ url_for('add_to_cart') }}" method="POST">
                 <input type="hidden" name="soapid" value="{{ item[0] }}">
                 <input type="hidden" name="redirect_url" value="{{ request.url }}">
-                <button type="submit">Add to Cart</button>
+                <button type="submit" class="add-to-cart">Add to Cart</button>
             </form>
         </li>
         {% endfor %}
