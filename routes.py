@@ -136,7 +136,7 @@ def userinfo(userid):
     session_userid = session.get("userid")
     if session_userid != userid:
         # If a user is trying to access another user's info by manual URL,
-        return 404
+        return render_template('404.html'), 404
     conn = sqlite3.connect("Soap.db")
     # SQL query that gathers all the user's data
     sql = "SELECT * FROM User WHERE userid = ?"
@@ -145,7 +145,7 @@ def userinfo(userid):
 
     if not user:
         # If there isn't a user, tell user
-        return "User not found", 404
+        return render_template('404.html'), 404
 
     # Return user.html, pass on the user's info to template
     return render_template("user.html", user=user)
@@ -359,7 +359,7 @@ def complete_order(cartid):
     if not cart:
         # If the cart doesn't exist, show error page
         conn.close()
-        return "Cart not found", 404
+        return render_template('404.html'), 404
 
     # SQL query to check if there are any items in the cart
     sql = "SELECT COUNT(*) FROM CartItem WHERE cartid = ?"
