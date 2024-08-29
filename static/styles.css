@@ -22,6 +22,7 @@ h5,
 h6,
 .home-link {
     font-family: 'Rock Salt', cursive;
+    text-align: center;
 }
 
 ul,
@@ -187,6 +188,16 @@ input[type="text"] {
     width: 100%;
     margin-bottom: 20px;
     text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.previous-carts-list {
+    width: 50%;
+    margin-bottom: 20px;
+    justify-content: center;
     border: 1px solid #ddd;
     border-radius: 5px;
     overflow: hidden;
@@ -573,7 +584,6 @@ hr {
 }
 
 .back-to-home,
-.clear-filters a,
 .delete-account-link {
     color: #b5446e;
     display: block;
@@ -583,7 +593,8 @@ hr {
     max-width: 25%;
 }
 
-.update-link {
+.update-link,
+.clear-filters a {
     color: #98c1d9;
     display: block;
     margin-top: 15px;
@@ -638,9 +649,11 @@ hr {
 
 /* General Styles for About and FAQs */
 .about-page h1,
-.faqs-page h1 {
+.faqs-page h1,
+.contact-form-container h1,
+.cart-container h1,
+.error-container h1 {
     font-size: 2.5em;
-    color: #333;
     text-align: center;
     margin-top: 1em;
     margin-bottom: 1em;
@@ -657,12 +670,13 @@ hr {
 }
 
 .about-page p,
-.faqs-page p {
+.faqs-page p,
+.error-container p {
     font-size: 1.2em;
     color: #2b3d41;
     line-height: 1.6;
     margin-bottom: 1em;
-    text-align: justify;
+    text-align: center;
 }
 
 /* Specific Page Styling */
@@ -706,6 +720,11 @@ hr {
 
 .contact-form-container .submit-button:hover {
     background-color: #f5c6cb;
+}
+
+.previous-carts-list {
+    text-align: center;
+    border-radius: 3px;
 }
 
 /* Responsive Design */

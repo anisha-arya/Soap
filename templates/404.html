@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block title %}Error 404 | Soaporium{% endblock %}
+{% block content %}
+    <div class="error-container">
+        <h1>404 Not Found</h1>
+        <p>Sorry, the page you are looking for does not exist, or you do not have access to it.</p>
+        <a href="{{ url_for('home') }}" class="back-to-home">Back to Home</a>
+    </div>
+{% endblock %}
