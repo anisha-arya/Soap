@@ -95,6 +95,9 @@ li {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .home-link,
@@ -709,7 +712,7 @@ hr {
     border-radius: 5px;
 }
 
-.contact-form-container .submit-button {
+.contact-form-container .submit-button, .back-to-home-button button {
     background-color: #b5446e;
     color: white;
     padding: 10px 20px;
@@ -718,7 +721,12 @@ hr {
     cursor: pointer;
 }
 
-.contact-form-container .submit-button:hover {
+.back-to-home-button button {
+    position: absolute;
+    bottom: 250px;
+}
+
+.contact-form-container .submit-button:hover, .back-to-home-button button:hover {
     background-color: #f5c6cb;
 }
 
