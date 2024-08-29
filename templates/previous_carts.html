@@ -7,6 +7,7 @@
 <h1>Previous Carts</h1>
 
 {% if completed_carts and completed_carts|length > 0 %}
+<div class="previous-carts-list">
 <ul>
     {% for cart in completed_carts %}
     <li>
@@ -20,6 +21,7 @@
     </li>
     {% endfor %}
 </ul>
+</div>
 {% else %}
 <p>No previous carts found.</p>
 {% endif %}

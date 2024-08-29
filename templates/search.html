@@ -10,7 +10,7 @@
     <form action="{{ url_for('search') }}" method="get" class="search-form">
         <div class="input-wrapper">
             <li class="filter-dropdown">
-                <button class="filter-button">Filter</button>
+                <button class="filter-button">Filter <i class="fa fa-sort"></i></button>
                 <ul class="search-dropdown-content">
                     <li>
                         <a href="{{ url_for('search', search_term=search_term, filter='bar', sort=sort_option) }}">
@@ -25,7 +25,7 @@
                 </ul>
             </li>
             <li class="sort-dropdown">
-                <button class="sort-button">Sort</button>
+                <button class="sort-button">Sort <i class="fa fa-unsorted"></i></button>
                 <ul class="search-dropdown-content">
                     <li>
                         <a
@@ -54,7 +54,7 @@
             </li>
 
             <input type="text" name="search_term" placeholder="Search..." value="{{ search_term }}">
-            <button type="submit" class="search-button">Search</button>
+            <button type="submit" class="search-button"><i class="fa fa-search"></i></button>
         </div>
     </form>
 

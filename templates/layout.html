@@ -31,12 +31,12 @@
                     <ul class="dropdown-content">
                         <li><a href="{{ url_for('userinfo', userid=session.get('userid')) }}">My account</a></li>
                         <li><a href="{{ url_for('logout') }}"><i class="fa fa-sign-out"></i> Sign
-                                Out</a></li>
+                                out</a></li>
                     </ul>
                 </li>
                 {% else %}
                 <li><a href="{{ url_for('login') }}">Login</a></li>
-                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign up</a></li>
                 {% endif %}
             </ul>
         </nav>
