@@ -214,7 +214,7 @@ def customer_service():
         sql = """
         INSERT INTO CustomerServiceRequest
         (name, email, subject, message)
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?)
         """
         cursor.execute(sql, (name, email, subject, message))
         conn.commit()
@@ -630,6 +630,12 @@ def about():
 @app.route("/faqs")
 def faqs():
     return render_template("faqs.html")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # Render the custom 404 template
+    return render_template('404.html'), 404
 
 
 if __name__ == "__main__":
