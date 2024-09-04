@@ -6,7 +6,19 @@
 {% block content %}
 <div class="contact-form-container">
     <h1>Contact Us</h1>
-    <p>Got any questions, queries, or concerns? Fill out the details below and we'll get back to you as soon as possible!</p>
+    <p>Got any questions, queries, or concerns? Fill out the details below and we'll get back to you as soon as
+        possible!</p>
+    <!-- Flash Messages for Errors or Other Notifications -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <form action="{{ url_for('customer_service') }}" method="post">
         <label for="name">Name</label>
         <input type="text" id="name" name="name" required>
@@ -23,14 +35,5 @@
         <button type="submit" class="submit-button">Send Message</button>
     </form>
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
 </div>
 {% endblock %}
