@@ -1,6 +1,6 @@
 /* Import fonts for the site */
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gorditas:wght@400;700&display=swap');
 
 /* Global Styles */
 body {
@@ -21,7 +21,8 @@ h4,
 h5,
 h6,
 .home-link {
-    font-family: 'Rock Salt', cursive;
+    font-family: "Gorditas", serif;
+    font-weight: 100;
     text-align: center;
 }
 
