@@ -63,7 +63,7 @@
     {% else %}
     <p>User information not available</p>
     {% endif %}
-    <a href="{{ url_for('update_address', userid=user[0]) }}" class="update-link">Update address</a>
+    <a href="{{ url_for('update_info', field='address') }}" class="update-link">Update address</a>
 
     <br>
 
