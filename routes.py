@@ -536,17 +536,35 @@ def search():
 
     # Execute the query with the constructed SQL and parameters
     results = conn.execute(sql, params).fetchall()
+
+    # Prepare cart quantities
+    cart_quantities = {}
+    userid = session.get('userid')
+    if userid:
+        # Query to get cart quantities for the logged-in user
+        sql = """SELECT soapid, quantity
+                 FROM CartItem
+                 WHERE cartid IN (
+                     SELECT cartid
+                     FROM Cart
+                     WHERE userid = ? AND status = 'open'
+                 )"""
+        items = conn.execute(sql, (userid,)).fetchall()
+        cart_quantities = {item[0]: item[1] for item in items}
+
     conn.close()
 
-    # Return search.html
+    # Render the template with results and cart quantities
     return render_template("search.html",
-                           results=results, search_term=search_term,
+                           results=results,
+                           search_term=search_term,
                            filter_option=filter_option,
-                           sort_option=sort_option)
+                           sort_option=sort_option,
+                           cart_quantities=cart_quantities)
 
 
 # Decreasing quantity route
-@app.route("/decrease_quantity/<int:soapid>")
+@app.route("/decrease_quantity/<int:soapid>", methods=["POST"])
 def decrease_quantity(soapid):
     # Get user id
     userid = session.get("userid")
@@ -562,14 +580,14 @@ def decrease_quantity(soapid):
     cart = conn.execute(sql, (userid,)).fetchone()
 
     if cart:
-        # If there's a cart, make sure 1 instance is being referrenced
+        # If there's a cart, make sure 1 instance is being referenced
         cartid = cart[0]
 
     if not cart:
         # SQL query that creates an open cart if there isn't one
         sql = """INSERT INTO Cart (userid, order_date, status)
                 VALUES (?, datetime('now'), 'open')"""
-        conn.execute(sql, (userid,))
+        conn.execute(sql, (userid, ))
         conn.commit()
         # SQL query that gets the cartid of the open cart of the user
         sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
@@ -591,7 +609,7 @@ def decrease_quantity(soapid):
     if new_quantity > 0:
         # If the new quantity is more than 0, update the quantity
         sql = """UPDATE CartItem SET quantity = ?
-        WHERE cartid = ? AND soapid = ?"""
+                 WHERE cartid = ? AND soapid = ?"""
         conn.execute(sql, (new_quantity, cartid, soapid))
     else:
         # If the new quantity is 0, delete item from cart
@@ -602,7 +620,8 @@ def decrease_quantity(soapid):
 
     # Tell user cart is successfully updated, return cart.html
     flash("Cart updated")
-    return redirect(url_for("view_current_cart"))
+    redirect_url = request.form.get("redirect_url", url_for("search"))
+    return redirect(redirect_url)
 
 
 @app.route('/update_info/<field>', methods=['GET', 'POST'])
@@ -628,7 +647,6 @@ def update_info(field):
         return redirect(url_for('userinfo', userid=userid))
 
     if request.method == 'POST':
-
         # Special handling for updating the address
         if field == 'address':
             housenum = request.form.get("housenum")
@@ -647,10 +665,10 @@ def update_info(field):
                 len(region) < 5 or len(region) > 50 or \
                 len(country) < 3 or len(country) > 50 or \
                     len(postcode) < 4 or len(postcode) > 10:
-                flash('Invalid address details, please check your input.',
-                      'error')
-                return render_template('update_info.html',
-                                       field=field, userid=userid)
+                flash('Invalid address details.', 'error')
+                return render_template('update_info.html', field=field,
+                                       userid=userid,
+                                       valid_fields=valid_fields)
 
             conn = sqlite3.connect('Soap.db')
             cursor = conn.cursor()
@@ -658,11 +676,11 @@ def update_info(field):
             # Update address fields in the database
             cursor.execute("""
                 UPDATE User
-                SET housenum = ?, street = ?, suburb = ?, town = ?,\
-                           region = ?, country = ?, postcode = ?
+                SET housenum = ?, street = ?, suburb = ?, town = ?, region = ?,
+                           country = ?, postcode = ?
                 WHERE userid = ?
-            """, (housenum, street, suburb, town, region,
-                  country, postcode, userid))
+            """, (housenum, street, suburb, town, region, country,
+                  postcode, userid))
             conn.commit()
             conn.close()
 
@@ -671,6 +689,7 @@ def update_info(field):
 
         # Generic field updates (fname, lname, email, password)
         new_value = request.form.get(field)
+        confirm_password = request.form.get('confirm-password')
 
         if new_value:
             conn = sqlite3.connect('Soap.db')
@@ -678,19 +697,24 @@ def update_info(field):
 
             # Validation for alphabetic fields
             if not re.match(r"^[A-Za-z\s!@#$%^&*(),.?\":{}|<>]+$", new_value)\
-                    and field != 'email':
+                    and field != 'email' and field != 'password':
                 flash("You can only input letters, spaces,\
                       and certain symbols in this field.")
-                return render_template('update_info.html',
-                                       field=field, userid=userid,
+                return render_template('update_info.html', field=field,
+                                       userid=userid,
                                        valid_fields=valid_fields)
 
             # Special handling for password
             if field == 'password':
                 if len(new_value) < 5 or len(new_value) > 50:
                     flash("Your new password must be between 5-50 characters.")
-                    return render_template('update_info.html',
-                                           field=field, userid=userid,
+                    return render_template('update_info.html', field=field,
+                                           userid=userid,
+                                           valid_fields=valid_fields)
+                if new_value != confirm_password:
+                    flash("Passwords do not match. Please try again.", 'error')
+                    return render_template('update_info.html', field=field,
+                                           userid=userid,
                                            valid_fields=valid_fields)
 
                 new_value = generate_password_hash(new_value)
@@ -701,23 +725,22 @@ def update_info(field):
                                           (new_value,)).fetchone()
                 if not existing:
                     if len(new_value) < 10 or len(new_value) > 50:
-                        flash("Your new email must be\
-                              between 10-50 characters")
-                        return render_template('update_info.html',
-                                               field=field, userid=userid,
+                        flash("Your email must be between 10-50 characters")
+                        return render_template('update_info.html', field=field,
+                                               userid=userid,
                                                valid_fields=valid_fields)
                 else:
                     flash("This email is already in use, please try again.")
-                    return render_template('update_info.html',
-                                           field=field, userid=userid,
+                    return render_template('update_info.html', field=field,
+                                           userid=userid,
                                            valid_fields=valid_fields)
 
             # Validation for first name and last name
             elif field == 'fname' or field == 'lname':
                 if len(new_value) < 2 or len(new_value) > 50:
                     flash("Input must be between 2-50 characters.")
-                    return render_template('update_info.html',
-                                           field=field, userid=userid,
+                    return render_template('update_info.html', field=field,
+                                           userid=userid,
                                            valid_fields=valid_fields)
 
             # Update the specific field in the database
@@ -729,7 +752,8 @@ def update_info(field):
             flash(f"{valid_fields[field]} updated successfully.", "success")
             return redirect(url_for('userinfo', userid=userid))
 
-    return render_template('update_info.html', field=field, userid=userid,
+    return render_template('update_info.html', field=field,
+                           userid=userid,
                            valid_fields=valid_fields)
 
 
