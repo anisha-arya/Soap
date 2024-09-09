@@ -21,14 +21,14 @@
     <ul>
         {% for item in cart_items %}
         <li class="cart-item">
-            <h2>{{ item[1] }}</h2> <!-- Soap name -->
-            <p>Quantity: {{ item[3] }}</p> <!-- Total quantity for each soap -->
-            <p>Unit Price: ${{ item[2] }}</p> <!-- Unit price -->
-            <p>Total Price: ${{ "{:.2f}".format(item[2] * item[3]) }}</p> <!-- Total price for each soap -->
+            <h2>{{ item.soap_name }}</h2> <!-- Soap name -->
+            <p>Quantity: {{ item.soap_quantity }}</p> <!-- Total quantity for each soap -->
+            <p>Unit Price: ${{ item.unit_price }}</p> <!-- Unit price -->
+            <p>Total Price: ${{ item.total_unit_price }}</p> <!-- Total price for each soap -->
 
             <!-- Form to add item to cart -->
             <form action="{{ url_for('add_to_cart') }}" method="POST">
-                <input type="hidden" name="soapid" value="{{ item[0] }}">
+                <input type="hidden" name="soapid" value="{{ item.soapid }}"> <!-- Make sure to use the correct variable name -->
                 <input type="hidden" name="redirect_url" value="{{ request.url }}">
                 <button type="submit" class="add-to-cart">Add to Cart</button>
             </form>
