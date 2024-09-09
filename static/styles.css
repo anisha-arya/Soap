@@ -368,7 +368,8 @@ input[type="password"] {
 .add-to-cart,
 .user-dropdown-btn,
 .cancel-button,
-.update-button {
+.update-button,
+.quantity-button {
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
@@ -380,11 +381,20 @@ input[type="password"] {
     text-decoration: none;
 }
 
+/* Button hover effect */
 .add-to-cart:hover,
 .user-dropdown-btn:hover,
 .cancel-button:hover,
-.update-button:hover {
+.update-button:hover,
+.quantity-button:hover {
     background-color: #2b3d41;
+}
+
+.cart-quantity {
+    display: flex;
+    align-items: center; /* Vertically align items in the center */
+    justify-content: center;
+    gap: 10px; /* Space between items */
 }
 
 /* Cart Page */
