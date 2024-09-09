@@ -566,61 +566,55 @@ def search():
 # Decreasing quantity route
 @app.route("/decrease_quantity/<int:soapid>", methods=["POST"])
 def decrease_quantity(soapid):
-    # Get user id
     userid = session.get("userid")
 
     if not userid:
-        # If there isn't a user logged in, prompt login
         flash("Please log in to update your cart")
         return redirect(url_for("login"))
 
     conn = sqlite3.connect("Soap.db")
-    # SQL query gathers open cart of the user
+
+    # Get or create an open cart
     sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
     cart = conn.execute(sql, (userid,)).fetchone()
 
-    if cart:
-        # If there's a cart, make sure 1 instance is being referenced
-        cartid = cart[0]
-
     if not cart:
-        # SQL query that creates an open cart if there isn't one
         sql = """INSERT INTO Cart (userid, order_date, status)
                 VALUES (?, datetime('now'), 'open')"""
         conn.execute(sql, (userid, ))
         conn.commit()
-        # SQL query that gets the cartid of the open cart of the user
-        sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
-        cart = conn.execute(sql, (userid,)).fetchone()
+        cart = conn.execute("SELECT cartid FROM Cart WHERE userid = ?\
+                            AND status = 'open'", (userid,)).fetchone()
 
-    # SQL query gathers information about a specific item in cart
-    sql = "SELECT * FROM CartItem WHERE cartid = ? AND soapid = ?"
+    cartid = cart[0]
+
+    # Get the cart item
+    sql = "SELECT quantity FROM CartItem WHERE cartid = ? AND soapid = ?"
     cart_item = conn.execute(sql, (cartid, soapid)).fetchone()
 
     if not cart_item:
-        # If there is none of that item, tell user
         flash("Item not found")
         conn.close()
         return redirect(url_for("view_current_cart"))
 
-    # Set new quantity as -1 less than current
-    new_quantity = cart_item[2] - 1
+    new_quantity = cart_item[0] - 1
 
     if new_quantity > 0:
-        # If the new quantity is more than 0, update the quantity
         sql = """UPDATE CartItem SET quantity = ?
                  WHERE cartid = ? AND soapid = ?"""
         conn.execute(sql, (new_quantity, cartid, soapid))
     else:
-        # If the new quantity is 0, delete item from cart
         sql = "DELETE FROM CartItem WHERE cartid = ? AND soapid = ?"
         conn.execute(sql, (cartid, soapid))
+
     conn.commit()
     conn.close()
 
-    # Tell user cart is successfully updated, return cart.html
     flash("Cart updated")
-    redirect_url = request.form.get("redirect_url", url_for("search"))
+
+    # Get the redirect URL from the form
+    redirect_url = request.form.get("redirect_url",
+                                    url_for("view_current_cart"))
     return redirect(redirect_url)
 
 
