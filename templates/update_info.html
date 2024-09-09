@@ -16,11 +16,13 @@
 
 <div class="update-info-container">
     <h2>Update {{ valid_fields[field] }}</h2>
-    <form method="POST" class="update-form">
-
+    <form method="POST" action="{{ url_for('update_info', field=field) }}" class="update-form">
         {% if field == 'password' %}
         <label for="password">New Password</label>
         <input type="password" id="password" name="password" required>
+
+        <label for="confirm-password">Confirm Password</label>
+        <input type="password" id="confirm-password" name="confirm-password" required>
 
         {% elif field == 'address' %}
         <!-- Address Update Fields -->
