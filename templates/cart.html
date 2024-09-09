@@ -24,7 +24,19 @@
             <p>Quantity: {{ item.soap_quantity }}</p> <!-- Quantity for each soap -->
             <p>Unit Price: ${{ item.unit_price }}</p> <!-- Unit price -->
             <p>Total Price: ${{ item.total_unit_price }}</p> <!-- Total price for each soap -->
-            <a href="{{ url_for('decrease_quantity', cartid=cartid, soapid=item.soapid )}}">Remove one</a>
+
+            <div class="cart-quantity">
+                    <form action="{{ url_for('decrease_quantity', soapid=item.soapid) }}" method="POST">
+                        <input type="hidden" name="redirect_url" value="{{ request.url }}">
+                        <button type="submit" class="quantity-button decrease-quantity">-</button>
+                    </form>
+                    <form action="{{ url_for('add_to_cart') }}" method="POST">
+                        <input type="hidden" name="soapid" value="{{ item.soapid }}">
+                        <input type="hidden" name="redirect_url" value="{{ request.url }}">
+                        <button type="submit" class="quantity-button increase-quantity">+</button>
+                    </form>
+                </div>
+            
         </li>
         {% endfor %}
     </ul>

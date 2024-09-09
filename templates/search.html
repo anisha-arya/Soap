@@ -36,7 +36,7 @@
                     <li>
                         <a
                             href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='ascending') }}">
-                            Price $-$$$
+                            Price: $-$$$
                         </a>
                     </li>
                     <li>
@@ -76,13 +76,12 @@
                 {% if item[0] in cart_quantities %}
                 <!-- If the soap is already in the cart -->
                 <div class="cart-quantity">
-                    <form action="{{ url_for('decrease_quantity', soapid=item[0]) }}" method="POST"
-                        style="display:inline;">
+                    <form action="{{ url_for('decrease_quantity', soapid=item[0]) }}" method="POST">
                         <input type="hidden" name="redirect_url" value="{{ request.url }}">
                         <button type="submit" class="quantity-button decrease-quantity">-</button>
                     </form>
                     <span class="quantity-display">{{ cart_quantities[item[0]] }}</span>
-                    <form action="{{ url_for('add_to_cart') }}" method="POST" style="display:inline;">
+                    <form action="{{ url_for('add_to_cart') }}" method="POST">
                         <input type="hidden" name="soapid" value="{{ item[0] }}">
                         <input type="hidden" name="redirect_url" value="{{ request.url }}">
                         <button type="submit" class="quantity-button increase-quantity">+</button>
