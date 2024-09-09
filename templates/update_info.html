@@ -3,13 +3,55 @@
 {% block title %}Update {{ field.replace('_', ' ').title() }} | Soaporium{% endblock %}
 
 {% block content %}
-<div class="update-info-container">
-    <h2>Update {{ field.replace('_', ' ').title() }}</h2>
-    <form method="POST" class="update-form">
-        <label for="{{ field }}">{{ field.replace('_', ' ').title() }}</label>
-        <input type="text" id="{{ field }}" name="{{ field }}" required>
+<!-- Flash Messages for Errors or Other Notifications -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flash-messages">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
 
-        <button type="submit" class="update-button">Update {{ field.replace('_', ' ').title() }}</button>
+<div class="update-info-container">
+    <h2>Update {{ valid_fields[field] }}</h2>
+    <form method="POST" class="update-form">
+
+        {% if field == 'password' %}
+        <label for="password">New Password</label>
+        <input type="password" id="password" name="password" required>
+
+        {% elif field == 'address' %}
+        <!-- Address Update Fields -->
+        <label for="housenum">House Number</label>
+        <input type="text" id="housenum" name="housenum" required>
+        
+        <label for="street">Street</label>
+        <input type="text" id="street" name="street" required>
+        
+        <label for="suburb">Suburb</label>
+        <input type="text" id="suburb" name="suburb" required>
+        
+        <label for="town">Town</label>
+        <input type="text" id="town" name="town" required>
+        
+        <label for="region">Region</label>
+        <input type="text" id="region" name="region" required>
+        
+        <label for="country">Country</label>
+        <input type="text" id="country" name="country" required>
+        
+        <label for="postcode">Postcode</label>
+        <input type="text" id="postcode" name="postcode" required>
+
+        {% else %}
+        <!-- Generic Text Input -->
+        <label for="{{ field }}">{{ valid_fields[field] }}</label>
+        <input type="text" id="{{ field }}" name="{{ field }}" required>
+        {% endif %}
+
+        <button type="submit" class="update-button">Update {{ valid_fields[field] }}</button>
     </form>
     <br>
     <a href="{{ url_for('userinfo', userid=userid) }}"><button type="button" class="cancel-button">Cancel</button></a>
