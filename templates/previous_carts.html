@@ -6,23 +6,25 @@
 {% block content %}
 <h1>Previous Carts</h1>
 
-{% if completed_carts and completed_carts|length > 0 %}
-<div class="previous-carts-list">
-<ul>
-    {% for cart in completed_carts %}
-    <li>
-        Cart ID: {{ cart[0] }}
-        <br>
-        Order Date: {{ cart[2] }}
-        <br>
-        <a href="{{ url_for('view_previous_order', cartid=cart[0]) }}">View contents</a>
-        <br>
-        <br>
-    </li>
-    {% endfor %}
-</ul>
+<div class="content-wrapper">
+    {% if completed_carts and completed_carts|length > 0 %}
+    <div class="previous-carts-list">
+        <ul>
+            {% for cart in completed_carts %}
+            <li>
+                Cart ID: {{ cart[0] }}
+                <br>
+                Order Date: {{ cart[2] }}
+                <br>
+                <a href="{{ url_for('view_previous_order', cartid=cart[0]) }}">View contents</a>
+                <br>
+                <br>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <p>No previous carts found.</p>
+    {% endif %}
 </div>
-{% else %}
-<p>No previous carts found.</p>
-{% endif %}
 {% endblock %}

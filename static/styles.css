@@ -130,7 +130,8 @@ li {
     max-width: 300px;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="password"] {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ddd;
@@ -206,6 +207,12 @@ input[type="text"] {
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.content-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .hitem a {
@@ -421,9 +428,15 @@ input[type="text"] {
 }
 
 .cart-navigation a {
-    display: inline-block;
-    padding: 10px 20px;
-    color: #fff;
+    text-decoration: none;
+    color:#b5446e;
+}
+
+.cart-navigation a:hover {
+    text-decoration: underline;
+}
+
+.cart-navigation p {
     text-decoration: none;
     border-radius: 5px;
 }
