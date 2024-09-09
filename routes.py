@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, \
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import secrets
+import re
 
 app = Flask(__name__)
 
@@ -44,8 +45,8 @@ def login():
         user = conn.execute(sql, (email,)).fetchone()
         conn.close()
 
-        if len(email) < 2 or len(email) > 50 or\
-                len(password) < 2 or len(password) > 50:
+        if len(email) < 10 or len(email) > 50 or\
+                len(password) < 5 or len(password) > 50:
             flash('Something went wrong, please try again soon', 'error')
             return redirect(url_for('login'))
 
@@ -228,7 +229,7 @@ def customer_service():
     return render_template("contact.html")
 
 
-# Current cart route
+# View current cart route
 @app.route("/view_current_cart")
 def view_current_cart():
     # Gather the userid for the user currently using the site
@@ -241,53 +242,61 @@ def view_current_cart():
         return redirect(url_for("login"))
 
     conn = sqlite3.connect("Soap.db")
+
     # SQL query checks if there is a current cart open
     sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
     cartid = conn.execute(sql, (userid,)).fetchone()
 
     if cartid:
-        """ If there is a current cart,
-        make sure only 1 instance if being referrenced """
         cartid = cartid[0]
-
-    if not cartid:
+    else:
         # SQL query that creates an open cart if there isn't one
         sql = """INSERT INTO Cart (userid, order_date, status)
                 VALUES (?, datetime('now'), 'open')"""
         conn.execute(sql, (userid,))
         conn.commit()
-        # SQL query that gets the cartid of the open cart of the user
         sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
         cartid = conn.execute(sql, (userid,)).fetchone()
         cartid = cartid[0]
 
-    # SQL query that gathers all the items from the cart,
-    # sums the total quantity of each item,
-    # and groups the items
+    # SQL query that gathers all the items from the cart
     sql = """
         SELECT Soap.soapid AS soapid,
                Soap.name AS soap_name,
                Soap.price AS unit_price,
-               CartItem.quantity AS soap_quantity,
-               CartItem.soapid,
-               SUM(CartItem.quantity) AS total_quantity
+               CartItem.quantity AS soap_quantity
         FROM CartItem
         JOIN Soap ON Soap.soapid = CartItem.soapid
         WHERE CartItem.cartid = ?
-        GROUP BY CartItem.soapid
         """
     cart_items = conn.execute(sql, (cartid,)).fetchall()
-    # Calculating the total price for all the items in the cart by
-    # Multiplying the item quantity by the unit price and summing all values
+
+    # Calculating the total price for all the items in the cart
     total_price = sum(
-        item[2] * item[3]
-        for item in cart_items)
+        item[2] * item[3]  # item[2] is unit_price, item[3] is soap_quantity
+        for item in cart_items
+    )
+
+    total_price = "{:.2f}".format(total_price)
+
+    # Format each item with its total price
+    formatted_cart_items = [
+        {
+            "soapid": item[0],
+            "soap_name": item[1],
+            "unit_price": "{:.2f}".format(item[2]),
+            "soap_quantity": item[3],
+            "total_unit_price": "{:.2f}".format(item[2] * item[3])
+        }
+        for item in cart_items
+    ]
+
     conn.close()
 
-    # Return cart.html, pass on cart_items, total_price, and cartid to template
+    # Return cart.html
     return render_template(
         "cart.html",
-        cart_items=cart_items,
+        cart_items=formatted_cart_items,
         total_price=total_price,
         cartid=cartid
     )
@@ -304,37 +313,63 @@ def add_to_cart():
     soapid = request.form.get("soapid")
     redirect_url = request.form.get("redirect_url")
 
-    conn = sqlite3.connect("Soap.db")
-    sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
-    cart = conn.execute(sql, (userid,)).fetchone()
+    if not soapid:
+        flash("No item specified to add to cart")
+        return redirect(redirect_url or url_for('search'))
 
-    if not cart:
-        sql = """INSERT INTO Cart (userid, order_date, status)
-                VALUES (?, datetime('now'), 'open')"""
-        conn.execute(sql, (userid,))
-        conn.commit()
+    conn = sqlite3.connect("Soap.db")
+    try:
+        # Get the open cart for the user
         sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
         cart = conn.execute(sql, (userid,)).fetchone()
 
-    sql = "SELECT quantity FROM CartItem WHERE cartid = ? AND soapid = ?"
-    existing_item = conn.execute(sql, (cart[0], soapid)).fetchone()
-    sql = "SELECT name FROM Soap WHERE soapid = ?"
-    soap_name = conn.execute(sql, (soapid,)).fetchone()
-    soap_name = soap_name[0]
+        if not cart:
+            # No open cart exists, create a new one
+            sql = """INSERT INTO Cart (userid, order_date, status)
+                     VALUES (?, datetime('now'), 'open')"""
+            conn.execute(sql, (userid,))
+            conn.commit()
+            # Fetch the newly created cartid
+            sql = """SELECT cartid FROM Cart
+            WHERE userid = ? AND status = 'open'"""
+            cart = conn.execute(sql, (userid,)).fetchone()
 
-    if existing_item:
-        new_quantity = int(existing_item[0]) + 1
-        sql = """UPDATE CartItem SET quantity = ?
-            WHERE cartid = ? AND soapid = ?"""
-        conn.execute(sql, (new_quantity, cart[0], soapid))
-    else:
-        sql = """INSERT INTO CartItem (cartid, soapid, quantity)
-            VALUES (?, ?, 1)"""
-        conn.execute(sql, (cart[0], soapid))
-    conn.commit()
-    conn.close()
+        cartid = cart[0]
 
-    flash(f'{soap_name} added to cart', 'success')
+        # Check if the item already exists in the cart
+        sql = "SELECT quantity FROM CartItem WHERE cartid = ? AND soapid = ?"
+        existing_item = conn.execute(sql, (cartid, soapid)).fetchone()
+
+        # Fetch the soap name
+        sql = "SELECT name FROM Soap WHERE soapid = ?"
+        soap_name_result = conn.execute(sql, (soapid,)).fetchone()
+        if soap_name_result:
+            soap_name = soap_name_result[0]
+        else:
+            soap_name = "Unknown item"
+
+        if existing_item:
+            # Item exists, update the quantity
+            new_quantity = int(existing_item[0]) + 1
+            sql = """UPDATE CartItem SET quantity = ?
+                     WHERE cartid = ? AND soapid = ?"""
+            conn.execute(sql, (new_quantity, cartid, soapid))
+        else:
+            # Item does not exist, insert a new record
+            sql = """INSERT INTO CartItem (cartid, soapid, quantity)
+                     VALUES (?, ?, 1)"""
+            conn.execute(sql, (cartid, soapid))
+
+        conn.commit()
+        flash(f'{soap_name} added to cart', 'success')
+
+    except Exception as e:
+        # Log the error and provide feedback
+        app.logger.error(f"Error adding to cart: {e}")
+        flash("An error occurred while adding the item to the cart", 'error')
+    finally:
+        conn.close()
+
     return redirect(redirect_url or url_for('search'))
 
 
@@ -402,26 +437,44 @@ def view_previous_order(cartid):
               this order or it does not exist.")
         return redirect(url_for("previous_carts"))
 
-    # SQL query to gather the cart items
+# SQL query that gathers all the items from the cart
     sql = """
         SELECT Soap.soapid AS soapid,
                Soap.name AS soap_name,
                Soap.price AS unit_price,
-               CartItem.quantity AS soap_quantity,
-               CartItem.soapid,
-               SUM(CartItem.quantity) AS total_quantity
+               CartItem.quantity AS soap_quantity
         FROM CartItem
         JOIN Soap ON Soap.soapid = CartItem.soapid
         WHERE CartItem.cartid = ?
-        GROUP BY CartItem.soapid
         """
     cart_items = conn.execute(sql, (cartid,)).fetchall()
-    total_price = sum(item[2] * item[3] for item in cart_items)
+
+    # Calculating the total price for all the items in the cart
+    total_price = sum(
+        item[2] * item[3]  # item[2] is unit_price, item[3] is soap_quantity
+        for item in cart_items
+    )
+
+    total_price = "{:.2f}".format(total_price)
+
+    # Format each item with its total price
+    formatted_cart_items = [
+        {
+            "soapid": item[0],
+            "soap_name": item[1],
+            "unit_price": "{:.2f}".format(item[2]),
+            "soap_quantity": item[3],
+            "total_unit_price": "{:.2f}".format(item[2] * item[3])
+        }
+        for item in cart_items
+    ]
+
     conn.close()
 
+    # Return cart.html
     return render_template(
-        "view_previous_order.html",  # This is the new template name
-        cart_items=cart_items,
+        "view_previous_order.html",
+        cart_items=formatted_cart_items,
         total_price=total_price,
         cartid=cartid
     )
@@ -552,7 +605,6 @@ def decrease_quantity(soapid):
     return redirect(url_for("view_current_cart"))
 
 
-# Updating info route
 @app.route('/update_info/<field>', methods=['GET', 'POST'])
 def update_info(field):
     userid = session.get('userid')
@@ -561,28 +613,114 @@ def update_info(field):
         flash("Please log in to manage your account.", "warning")
         return redirect(url_for('login'))
 
+    # Define valid fields
     valid_fields = {
-        'fname': 'First Name',
-        'lname': 'Last Name',
+        'fname': 'First name',
+        'lname': 'Last name',
         'email': 'Email',
         'password': 'Password',
+        'address': 'Address',
     }
 
+    # Check if the field is valid
     if field not in valid_fields:
         flash("Invalid field specified.", "danger")
         return redirect(url_for('userinfo', userid=userid))
 
     if request.method == 'POST':
+
+        # Special handling for updating the address
+        if field == 'address':
+            housenum = request.form.get("housenum")
+            street = request.form.get("street")
+            suburb = request.form.get("suburb")
+            town = request.form.get("town")
+            region = request.form.get("region")
+            country = request.form.get("country")
+            postcode = request.form.get("postcode")
+
+            # Input validation
+            if len(housenum) < 1 or len(housenum) > 10 or \
+                len(street) < 5 or len(street) > 50 or \
+                len(suburb) < 5 or len(suburb) > 50 or \
+                len(town) < 5 or len(town) > 50 or \
+                len(region) < 5 or len(region) > 50 or \
+                len(country) < 3 or len(country) > 50 or \
+                    len(postcode) < 4 or len(postcode) > 10:
+                flash('Invalid address details, please check your input.',
+                      'error')
+                return render_template('update_info.html',
+                                       field=field, userid=userid)
+
+            conn = sqlite3.connect('Soap.db')
+            cursor = conn.cursor()
+
+            # Update address fields in the database
+            cursor.execute("""
+                UPDATE User
+                SET housenum = ?, street = ?, suburb = ?, town = ?,\
+                           region = ?, country = ?, postcode = ?
+                WHERE userid = ?
+            """, (housenum, street, suburb, town, region,
+                  country, postcode, userid))
+            conn.commit()
+            conn.close()
+
+            flash("Address updated successfully.", "success")
+            return redirect(url_for('userinfo', userid=userid))
+
+        # Generic field updates (fname, lname, email, password)
         new_value = request.form.get(field)
 
         if new_value:
             conn = sqlite3.connect('Soap.db')
             cursor = conn.cursor()
 
-            # Special handling for password (if applicable)
+            # Validation for alphabetic fields
+            if not re.match(r"^[A-Za-z\s!@#$%^&*(),.?\":{}|<>]+$", new_value)\
+                    and field != 'email':
+                flash("You can only input letters, spaces,\
+                      and certain symbols in this field.")
+                return render_template('update_info.html',
+                                       field=field, userid=userid,
+                                       valid_fields=valid_fields)
+
+            # Special handling for password
             if field == 'password':
+                if len(new_value) < 5 or len(new_value) > 50:
+                    flash("Your new password must be between 5-50 characters.")
+                    return render_template('update_info.html',
+                                           field=field, userid=userid,
+                                           valid_fields=valid_fields)
+
                 new_value = generate_password_hash(new_value)
 
+            # Special handling for email
+            elif field == 'email':
+                existing = cursor.execute("SELECT * FROM User WHERE email = ?",
+                                          (new_value,)).fetchone()
+                if not existing:
+                    if len(new_value) < 10 or len(new_value) > 50:
+                        flash("Your new email must be\
+                              between 10-50 characters")
+                        return render_template('update_info.html',
+                                               field=field, userid=userid,
+                                               valid_fields=valid_fields)
+                else:
+                    flash("This email is already in use, please try again.")
+                    return render_template('update_info.html',
+                                           field=field, userid=userid,
+                                           valid_fields=valid_fields)
+
+            # Validation for first name and last name
+            elif field == 'fname' or field == 'lname':
+                if len(new_value) < 2 or len(new_value) > 50:
+                    flash("Input must be between 2-50 characters.")
+                    return render_template('update_info.html',
+                                           field=field, userid=userid,
+                                           valid_fields=valid_fields)
+
+            # Update the specific field in the database
             cursor.execute(f"UPDATE User SET {field} = ? WHERE userid = ?",
                            (new_value, userid))
             conn.commit()
@@ -591,7 +729,8 @@ def update_info(field):
             flash(f"{valid_fields[field]} updated successfully.", "success")
             return redirect(url_for('userinfo', userid=userid))
 
-    return render_template('update_info.html', field=field, userid=userid)
+    return render_template('update_info.html', field=field, userid=userid,
+                           valid_fields=valid_fields)
 
 
 # Delete account route
