@@ -13,6 +13,13 @@
 <!-- Clickable Search Items -->
 <div class="home-items">
     <div class="hitem">
+        <a href="{{ url_for('search', search_term='') }}">
+            <img src="" alt="">
+            <h2>All soaps</h2>
+        </a>
+    </div>
+
+    <div class="hitem">
         <a href="{{ url_for('search', search_term='mint') }}">
             <img src="" alt="">
             <h2>Mint</h2>
