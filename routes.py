@@ -62,60 +62,55 @@ def login():
 # Sign up route
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    """ If a user wants to signup, get them to submit their firstname,
-    lastname, email, password, and confirm password """
     if request.method == "POST":
-        fname = request.form["fname"]
-        lname = request.form["lname"]
-        email = request.form["email"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm-password"]
+        fname = request.form.get("fname", "").strip()
+        lname = request.form.get("lname", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "").strip()
+        confirm_password = request.form.get("confirm-password", "").strip()
 
-        # Check if passwords match
         if password != confirm_password:
             flash("Passwords do not match. Please try again.", 'error')
             return redirect(url_for('signup'))
 
-        # Hash the password
-        hashed_password = generate_password_hash(password)
-
-        conn = sqlite3.connect("Soap.db")
-        # SQL for checking if there's already a user with the submitted email
-        sql = "SELECT * FROM User WHERE email = ?"
-        existing_user = conn.execute(sql, (email,)).fetchone()
-
-        if existing_user:
-            conn.close()
-            # If there is an existing user, tell the user
-            flash("Email unavailable.\
-                  Please choose another email or log in.", 'error')
-            # Return signup.html
+        if not (re.match(r"^[A-Za-z\s]+$", fname) and
+                re.match(r"^[A-Za-z\s]+$", lname)):
+            flash("Names can only contain letters and spaces.",
+                  'error')
             return redirect(url_for('signup'))
 
-        if len(fname) < 2 or len(fname) > 50 or\
-                len(lname) < 2 or len(lname) > 50:
-            flash('Name must be between 2 and 50 characters', 'error')
+        if len(fname) < 2 or len(fname) > 50 or len(lname) < 2\
+                or len(lname) > 50:
+            flash('Name must be between 2 and 50 characters.', 'error')
             return redirect(url_for('signup'))
 
         if len(password) < 8 or len(password) > 100 or\
                 len(email) < 8 or len(email) > 100:
-            flash('Password must be between 8 and 100 characters', 'error')
+            flash('Password and email must be between 8 and 100 characters.',
+                  'error')
             return redirect(url_for('signup'))
 
-        sql = (
-            "INSERT INTO User (fname, lname, email, password) \
-                VALUES (?, ?, ?, ?)"
-        )
-        conn.execute(sql, (fname, lname, email, hashed_password))
-        conn.commit()
-        conn.close()
+        try:
+            conn = sqlite3.connect("Soap.db")
+            sql = "SELECT * FROM User WHERE email = ?"
+            existing_user = conn.execute(sql, (email,)).fetchone()
 
-        # Tell user signup is successful, and login
-        flash("Thanks for signing up!")
-        # Redirect to login.html
+            if existing_user:
+                flash("Email unavailable.\
+                       Please choose another email or login.", 'error')
+                return redirect(url_for('signup'))
+
+            sql = "INSERT INTO User (fname, lname, email, password)\
+                VALUES (?, ?, ?, ?)"
+            conn.execute(sql, (fname, lname, email,
+                               generate_password_hash(password)))
+            conn.commit()
+        finally:
+            conn.close()
+
+        flash("Thanks for signing up! Please log in.")
         return redirect(url_for("login"))
 
-    # Return signup.html
     return render_template("signup.html")
 
 
@@ -418,6 +413,7 @@ def complete_order(cartid):
     return redirect(url_for("home"))
 
 
+# View previous order route
 @app.route("/view_previous_order/<int:cartid>")
 def view_previous_order(cartid):
     userid = session.get("userid")
@@ -433,11 +429,11 @@ def view_previous_order(cartid):
     result = conn.execute(sql, (cartid, userid)).fetchone()
 
     if not result or result[0] != 'completed':
-        flash("You are not authorized to view\
-              this order or it does not exist.")
+        flash("You are not authorized to view this\
+              order or it does not exist.")
         return redirect(url_for("previous_carts"))
 
-# SQL query that gathers all the items from the cart
+    # SQL query that gathers all the items from the cart
     sql = """
         SELECT Soap.soapid AS soapid,
                Soap.name AS soap_name,
@@ -469,14 +465,29 @@ def view_previous_order(cartid):
         for item in cart_items
     ]
 
+    cart_quantities = {}
+    userid = session.get('userid')
+    if userid:
+        # Query to get cart quantities for the logged-in user
+        sql = """SELECT soapid, quantity
+                 FROM CartItem
+                 WHERE cartid IN (
+                     SELECT cartid
+                     FROM Cart
+                     WHERE userid = ? AND status = 'open'
+                 )"""
+        items = conn.execute(sql, (userid,)).fetchall()
+        cart_quantities = {item[0]: item[1] for item in items}
+
     conn.close()
 
-    # Return cart.html
+    # Return view_previous_order.html
     return render_template(
         "view_previous_order.html",
         cart_items=formatted_cart_items,
         total_price=total_price,
-        cartid=cartid
+        cartid=cartid,
+        cart_quantities=cart_quantities
     )
 
 
@@ -613,8 +624,7 @@ def decrease_quantity(soapid):
     flash("Cart updated")
 
     # Get the redirect URL from the form
-    redirect_url = request.form.get("redirect_url",
-                                    url_for("view_current_cart"))
+    redirect_url = request.form.get("redirect_url")
     return redirect(redirect_url)
 
 
