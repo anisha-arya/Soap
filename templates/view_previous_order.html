@@ -26,12 +26,32 @@
             <p>Unit Price: ${{ item.unit_price }}</p> <!-- Unit price -->
             <p>Total Price: ${{ item.total_unit_price }}</p> <!-- Total price for each soap -->
 
-            <!-- Form to add item to cart -->
+            <!-- Check if item exists in cart_quantities -->
+            {% if item.soapid in cart_quantities %}
+            <div class="cart-quantity">
+                <!-- Form to decrease quantity -->
+                <form action="{{ url_for('decrease_quantity', soapid=item.soapid) }}" method="POST">
+                    <input type="hidden" name="redirect_url" value="{{ request.url }}">
+                    <button type="submit" class="quantity-button decrease-quantity">-</button>
+                </form>
+                <span class="quantity-display">{{ cart_quantities[item.soapid] }}</span>
+                <!-- Form to add to cart -->
+                <form action="{{ url_for('add_to_cart') }}" method="POST">
+                    <input type="hidden" name="soapid" value="{{ item.soapid }}">
+                    <input type="hidden" name="redirect_url" value="{{ request.url }}">
+                    <button type="submit" class="quantity-button increase-quantity">+</button>
+                </form>
+            </div>
+
+            {% else %}
+            <!-- If the soap is not in the cart -->
             <form action="{{ url_for('add_to_cart') }}" method="POST">
-                <input type="hidden" name="soapid" value="{{ item.soapid }}"> <!-- Make sure to use the correct variable name -->
+                <input type="hidden" name="soapid" value="{{ item.soapid }}">
                 <input type="hidden" name="redirect_url" value="{{ request.url }}">
                 <button type="submit" class="add-to-cart">Add to Cart</button>
             </form>
+            {% endif %}
+
         </li>
         {% endfor %}
     </ul>
