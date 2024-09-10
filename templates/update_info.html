@@ -27,25 +27,29 @@
         {% elif field == 'address' %}
         <!-- Address Update Fields -->
         <label for="housenum">House Number</label>
-        <input type="text" id="housenum" name="housenum" required>
-        
+        <input type="text" id="housenum" name="housenum" pattern="\d+" required
+            oninvalid="this.setCustomValidity('Please enter a valid house number (only digits).')"
+            oninput="this.setCustomValidity('')">
+
         <label for="street">Street</label>
-        <input type="text" id="street" name="street" required>
-        
+        <input type="text" id="street" name="street" pattern="[A-Za-z\s]+" required>
+
         <label for="suburb">Suburb</label>
-        <input type="text" id="suburb" name="suburb" required>
-        
+        <input type="text" id="suburb" name="suburb" pattern="[A-Za-z\s]+" required>
+
         <label for="town">Town</label>
-        <input type="text" id="town" name="town" required>
-        
+        <input type="text" id="town" name="town" pattern="[A-Za-z\s]+" required>
+
         <label for="region">Region</label>
-        <input type="text" id="region" name="region" required>
-        
+        <input type="text" id="region" name="region" pattern="[A-Za-z\s]+" required>
+
         <label for="country">Country</label>
-        <input type="text" id="country" name="country" required>
-        
+        <input type="text" id="country" name="country" pattern="[A-Za-z\s]+" required>
+
         <label for="postcode">Postcode</label>
-        <input type="text" id="postcode" name="postcode" required>
+        <input type="text" id="postcode" name="postcode" pattern="\d{4,10}" required
+            oninvalid="this.setCustomValidity('Postcode must be 4-10 digits long.')"
+            oninput="this.setCustomValidity('')">
 
         {% else %}
         <!-- Generic Text Input -->

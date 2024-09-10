@@ -36,25 +36,29 @@
 
     <form class="user-info-form" method="POST" action="{{ url_for('update_address', userid=user[0]) }}">
         <label for="housenum">House Number</label>
-        <input type="text" id="housenum" name="housenum" value="{{ user[3] or '' }}">
+        <input type="text" id="housenum" name="housenum" value="{{ user[3] or '' }}" pattern="\d+" required
+            oninvalid="this.setCustomValidity('Please enter a valid house number (only digits).')"
+            oninput="this.setCustomValidity('')">
 
         <label for="street">Street</label>
-        <input type="text" id="street" name="street" value="{{ user[4] or '' }}">
+        <input type="text" id="street" name="street" value="{{ user[4] or '' }}" pattern="[A-Za-z\s]+" required>
 
         <label for="suburb">Suburb</label>
-        <input type="text" id="suburb" name="suburb" value="{{ user[5] or '' }}">
+        <input type="text" id="suburb" name="suburb" value="{{ user[5] or '' }}" pattern="[A-Za-z\s]+" required>
 
         <label for="town">Town/City</label>
-        <input type="text" id="town" name="town" value="{{ user[6] or '' }}">
+        <input type="text" id="town" name="town" value="{{ user[6] or '' }}" pattern="[A-Za-z\s]+" required>
 
         <label for="region">Region</label>
-        <input type="text" id="region" name="region" value="{{ user[7] or '' }}">
+        <input type="text" id="region" name="region" value="{{ user[7] or '' }}" pattern="[A-Za-z\s]+" required>
 
         <label for="country">Country</label>
-        <input type="text" id="country" name="country" value="{{ user[8] or '' }}">
+        <input type="text" id="country" name="country" value="{{ user[8] or '' }}" pattern="[A-Za-z\s]+" required>
 
         <label for="postcode">Postal Code</label>
-        <input type="text" id="postcode" name="postcode" value="{{ user[9] or '' }}">
+        <input type="text" id="postcode" name="postcode" pattern="\d{4,10}" value="{{ user[9] or '' }}" required
+            oninvalid="this.setCustomValidity('Postcode must be 4-10 digits long.')"
+            oninput="this.setCustomValidity('')">
 
         <button type="submit">Update Address</button>
     </form>
