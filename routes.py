@@ -13,18 +13,52 @@ app = Flask(__name__)
 app.secret_key = secrets.token_hex(24)
 
 
+def execute_query(sql, params=(), fetchone=False,
+                  fetchall=False, commit=False):
+    """
+    Executes a query on the SQLite database.
+
+    :param sql: The SQL query to execute.
+    :param params: The parameters to pass to the query.
+    :param fetchone: Whether to fetch one result.
+    :param fetchall: Whether to fetch all results.
+    :param commit: Whether to commit the transaction
+    (use for INSERT, UPDATE, DELETE).
+    :return: Result of the query if fetchone or fetchall is True,
+    otherwise None.
+    """
+    connection = sqlite3.connect("Soap.db")
+    cursor = connection.cursor()
+    result = None
+
+    try:
+        cursor.execute(sql, params)
+        if commit:
+            connection.commit()
+
+        if fetchone:
+            result = cursor.fetchone()
+        elif fetchall:
+            result = cursor.fetchall()
+    except sqlite3.Error as e:
+        app.logger.error(f"Database error: {e}")
+        raise
+    finally:
+        connection.close()
+
+    return result
+
+
 # Context processor to inject the user's first name into all templates
 @app.context_processor
 def inject_user_firstname():
     user_firstname = None
     userid = session.get("userid")
     if userid:
-        conn = sqlite3.connect("Soap.db")
         sql = "SELECT fname FROM User WHERE userid = ?"
-        user = conn.execute(sql, (userid,)).fetchone()
+        user = execute_query(sql, (userid,), True, False, False)
         if user:
             user_firstname = user[0]
-        conn.close()
     return dict(user_firstname=user_firstname)
 
 
@@ -52,7 +86,7 @@ def login():
 
         if user and check_password_hash(user[11], password):
             session["userid"] = user[0]
-            return redirect(url_for("userinfo", userid=user[0]))
+            return redirect(url_for("home"))
         else:
             flash("Incorrect email or password")
 
@@ -408,9 +442,9 @@ def complete_order(cartid):
     conn.commit()
     conn.close()
 
-    # Tell user order is successfully marked complete, return home.html
+    # Tell user order is successfully marked complete, return cart.html
     flash("Order completed!")
-    return redirect(url_for("home"))
+    return redirect(url_for("view_current_cart"))
 
 
 # View previous order route
@@ -519,8 +553,8 @@ def search():
     conn = sqlite3.connect("Soap.db")
 
     # Start constructing the SQL query
-    sql = "SELECT * FROM Soap WHERE name LIKE ?"
-    params = [f"%{search_term}%"]
+    sql = "SELECT * FROM Soap WHERE name LIKE ? OR description LIKE ?"
+    params = [f"%{search_term}%", f"%{search_term}%"]
 
     # Apply filter if one is selected
     if filter_option:
