@@ -160,13 +160,13 @@ def logout():
 
 
 # User info route
-@app.route("/user/<int:userid>")
-def userinfo(userid):
+@app.route("/user")
+def userinfo():
     # Get the userid for the user currently using the site
-    session_userid = session.get("userid")
-    if session_userid != userid:
-        # If a user is trying to access another user's info by manual URL,
-        return render_template('404.html'), 404
+    userid = session.get("userid")
+    if not userid:
+        flash("Please login to access your information")
+        return render_template("login.html")
     conn = sqlite3.connect("Soap.db")
     # SQL query that gathers all the user's data
     sql = "SELECT * FROM User WHERE userid = ?"
@@ -179,39 +179,6 @@ def userinfo(userid):
 
     # Return user.html, pass on the user's info to template
     return render_template("user.html", user=user)
-
-
-# Updating address route
-@app.route("/user/<int:userid>/update_address", methods=["POST"])
-def update_address(userid):
-    housenum = request.form["housenum"]
-    street = request.form["street"]
-    suburb = request.form["suburb"]
-    town = request.form["town"]
-    region = request.form["region"]
-    country = request.form["country"]
-    postcode = request.form["postcode"]
-
-    if len(housenum) < 0 or len(housenum) > 10 or\
-            len(street) < 5 or len(street) > 50 or\
-            len(suburb) < 5 or len(suburb) > 50 or\
-            len(town) < 5 or len(town) > 50 or\
-            len(region) < 5 or len(region) > 50 or\
-            len(country) < 3 or len(country) > 50 or\
-            len(postcode) < 4 or len(postcode) > 10:
-        flash('Something went wrong, please try again soon', 'error')
-        return redirect(url_for('userinfo', userid=userid))
-
-    conn = sqlite3.connect("Soap.db")
-    sql = "UPDATE User SET housenum = ?, street = ?, suburb = ?, town = ?,\
-        region = ?, country = ?, postcode = ? WHERE userid = ?"
-    conn.execute(sql, (housenum, street, suburb, town, region,
-                       country, postcode, userid))
-    conn.commit()
-    conn.close()
-
-    flash("Address updated successfully")
-    return redirect(url_for("userinfo", userid=userid))
 
 
 # Contact route
