@@ -8,80 +8,42 @@
     <h1>My Account</h1>
 
     {% if user %}
-    <p><strong>First Name:</strong> {{ user[1] }}</p>
+        <p><strong>First Name:</strong> {{ user[1] }}</p>
+        <p><strong>Last Name:</strong> {{ user[2] }}</p>
+        <p><strong>Email:</strong> {{ user[10] }}</p>
 
-    <p><strong>Last Name:</strong> {{ user[2] }}</p>
+        <p class="update-links-p">
+            <a href="{{ url_for('update_info', field='fname') }}" class="update-link">Update first name</a>
+            <a href="{{ url_for('update_info', field='lname') }}" class="update-link">Update last name</a>
+            <a href="{{ url_for('update_info', field='email') }}" class="update-link">Update email</a>
+            <a href="{{ url_for('update_info', field='password') }}" class="update-link">Update password</a>
+        </p>
+        <hr>
 
-    <p><strong>Email:</strong> {{ user[10] }}</p>
+        {% if user[3] and user[4] and user[5] and user[6] and user[7] and user[8] and user[9] %}
+            <p><strong>Current Shipping Address</strong></p>
+            <p>{{ user[3] }} {{ user[4] }}</p>
+            <p>{{ user[5] }}, {{ user[6] }}</p>
+            <p>{{ user[7] }}, {{ user[8] }}</p>
+            <p>{{ user[9] }}</p>
+        {% else %}
+            <p>Looks like you haven't filled your shipping address in. Please <a href="{{ url_for('update_info', field='address') }}">update your address.</a></p>
 
-    <p class="update-links-p"><a href="{{ url_for('update_info', field='fname') }}" class="update-link">Update
-            first name</a>
-        <a href="{{ url_for('update_info', field='lname') }}" class="update-link">Update
-            last name</a>
-        <a href="{{ url_for('update_info', field='email') }}" class="update-link">Update email</a>
+            <br>
 
-        <a href="{{ url_for('update_info', field='password') }}" class="update-link">Update password</a>
-    </p>
-    <hr>
+            <p><a href="{{ url_for('delete_account') }}" class="delete-account-link">Delete account</a></p>
+        {% endif %}
 
-    {% if user[3] and user[4] and user[5] and user[6] and user[7] and user[8] and user[9] %}
-    <p><strong>Current Shipping Address</strong></p>
-    <p>{{ user[3] }} {{ user[4] }}</p>
-    <p>{{ user[5] }}, {{ user[6] }}</p>
-    <p>{{ user[7] }}, {{ user[8] }}</p>
-    <p>{{ user[9] }}</p>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    {% endif %} <!-- Closing the if for user -->
 
-    {% else %}
-    <p>Looks like you haven't filled your shipping address in. Please update your address below.</p>
-
-    <form class="user-info-form" method="POST" action="{{ url_for('update_address', userid=user[0]) }}">
-        <label for="housenum">House Number</label>
-        <input type="text" id="housenum" name="housenum" value="{{ user[3] or '' }}" pattern="\d+" required
-            oninvalid="this.setCustomValidity('Please enter a valid house number (only digits).')"
-            oninput="this.setCustomValidity('')">
-
-        <label for="street">Street</label>
-        <input type="text" id="street" name="street" value="{{ user[4] or '' }}" pattern="[A-Za-z\s]+" required>
-
-        <label for="suburb">Suburb</label>
-        <input type="text" id="suburb" name="suburb" value="{{ user[5] or '' }}" pattern="[A-Za-z\s]+" required>
-
-        <label for="town">Town/City</label>
-        <input type="text" id="town" name="town" value="{{ user[6] or '' }}" pattern="[A-Za-z\s]+" required>
-
-        <label for="region">Region</label>
-        <input type="text" id="region" name="region" value="{{ user[7] or '' }}" pattern="[A-Za-z\s]+" required>
-
-        <label for="country">Country</label>
-        <input type="text" id="country" name="country" value="{{ user[8] or '' }}" pattern="[A-Za-z\s]+" required>
-
-        <label for="postcode">Postal Code</label>
-        <input type="text" id="postcode" name="postcode" pattern="\d{4,10}" value="{{ user[9] or '' }}" required
-            oninvalid="this.setCustomValidity('Postcode must be 4-10 digits long.')"
-            oninput="this.setCustomValidity('')">
-
-        <button type="submit">Update Address</button>
-    </form>
-    {% endif %}
-
-    {% else %}
-    <p>User information not available</p>
-    {% endif %}
-    <a href="{{ url_for('update_info', field='address') }}" class="update-link">Update address</a>
-
-    <br>
-
-    <p><a href="{{ url_for('delete_account') }}" class="delete-account-link">Delete account</a></p>
-
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    {% endwith %}
 </div>
 {% endblock %}
