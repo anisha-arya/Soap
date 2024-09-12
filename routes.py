@@ -4,7 +4,6 @@ from flask import Flask, render_template, request, redirect, \
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import secrets
-import re
 
 app = Flask(__name__)
 
@@ -40,9 +39,11 @@ def execute_query(sql, params=(), fetchone=False,
             result = cursor.fetchone()
         elif fetchall:
             result = cursor.fetchall()
+
     except sqlite3.Error as e:
         app.logger.error(f"Database error: {e}")
         raise
+
     finally:
         connection.close()
 
@@ -74,10 +75,9 @@ def login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-        conn = sqlite3.connect("Soap.db")
+
         sql = "SELECT * FROM User WHERE email = ?"
-        user = conn.execute(sql, (email,)).fetchone()
-        conn.close()
+        user = execute_query(sql, (email,), True, False, False)
 
         if len(email) < 10 or len(email) > 50 or\
                 len(password) < 5 or len(password) > 50:
@@ -107,41 +107,29 @@ def signup():
             flash("Passwords do not match. Please try again.", 'error')
             return redirect(url_for('signup'))
 
-        if not (re.match(r"^[A-Za-z\s]+$", fname) and
-                re.match(r"^[A-Za-z\s]+$", lname)):
-            flash("Names can only contain letters and spaces.",
+        if len(fname) > 50 or len(lname) > 50:
+            flash('Name must be between 1 and 50 characters.', 'error')
+            return redirect(url_for('signup'))
+
+        if len(password) < 5 or len(password) > 100 or\
+                len(email) < 5 or len(email) > 100:
+            flash('Password and email must be between 5 and 100 characters.',
                   'error')
             return redirect(url_for('signup'))
 
-        if len(fname) < 2 or len(fname) > 50 or len(lname) < 2\
-                or len(lname) > 50:
-            flash('Name must be between 2 and 50 characters.', 'error')
+        sql = "SELECT * FROM User WHERE email = ?"
+        existing_user = execute_query(sql, (email,), True, False, False)
+
+        if existing_user:
+            flash("Email unavailable.\
+                    Please choose another email or login.", 'error')
             return redirect(url_for('signup'))
 
-        if len(password) < 8 or len(password) > 100 or\
-                len(email) < 8 or len(email) > 100:
-            flash('Password and email must be between 8 and 100 characters.',
-                  'error')
-            return redirect(url_for('signup'))
-
-        try:
-            conn = sqlite3.connect("Soap.db")
-            sql = "SELECT * FROM User WHERE email = ?"
-            existing_user = conn.execute(sql, (email,)).fetchone()
-
-            if existing_user:
-                flash("Email unavailable.\
-                       Please choose another email or login.", 'error')
-                return redirect(url_for('signup'))
-
-            sql = "INSERT INTO User (fname, lname, email, password)\
+        sql = "INSERT INTO User (fname, lname, email, password)\
                 VALUES (?, ?, ?, ?)"
-            conn.execute(sql, (fname, lname, email,
-                               generate_password_hash(password)))
-            conn.commit()
-        finally:
-            conn.close()
-
+        execute_query(sql,
+                      (fname, lname, email, generate_password_hash(password)),
+                      False, False, True)
         flash("Thanks for signing up! Please log in.")
         return redirect(url_for("login"))
 
@@ -164,14 +152,14 @@ def logout():
 def userinfo():
     # Get the userid for the user currently using the site
     userid = session.get("userid")
+
     if not userid:
         flash("Please login to access your information")
         return render_template("login.html")
-    conn = sqlite3.connect("Soap.db")
+
     # SQL query that gathers all the user's data
     sql = "SELECT * FROM User WHERE userid = ?"
-    user = conn.execute(sql, (userid,)).fetchone()
-    conn.close()
+    user = execute_query(sql, (userid,), True, False, False)
 
     if not user:
         # If there isn't a user, tell user
@@ -191,33 +179,14 @@ def customer_service():
         subject = request.form.get("subject")
         message = request.form.get("message")
 
-        # Validate the form data (you can expand this as needed)
-        if not name or not email or not subject or not message:
-            flash("All fields are required.", "error")
-            return redirect(url_for("customer_service"))
-
-        if len(name) < 2 or len(name) > 50 or\
-                len(email) < 2 or len(email) > 50 or\
-                len(subject) < 2 or len(subject) > 50 or\
-                len(message) < 2 or len(message) > 500:
-            flash('Something went wrong, please try again soon', 'error')
-            return redirect(url_for('customer_service'))
-
-        # Connect to the database
-        conn = sqlite3.connect("Soap.db")
-        cursor = conn.cursor()
-
         # Insert the form data into the CustomerServiceRequest table
         sql = """
         INSERT INTO CustomerServiceRequest
         (name, email, subject, message)
         VALUES (?, ?, ?, ?)
         """
-        cursor.execute(sql, (name, email, subject, message))
-        conn.commit()
-        conn.close()
+        execute_query(sql, (name, email, subject, message), False, False, True)
 
-        # Flash a success message and redirect to the same page or another page
         flash("Your request has been submitted successfully.", "success")
         return redirect(url_for("customer_service"))
 
@@ -237,11 +206,9 @@ def view_current_cart():
         # Return login.html
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("Soap.db")
-
     # SQL query checks if there is a current cart open
     sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
-    cartid = conn.execute(sql, (userid,)).fetchone()
+    cartid = execute_query(sql, (userid,), True, False, False)
 
     if cartid:
         cartid = cartid[0]
@@ -249,10 +216,9 @@ def view_current_cart():
         # SQL query that creates an open cart if there isn't one
         sql = """INSERT INTO Cart (userid, order_date, status)
                 VALUES (?, datetime('now'), 'open')"""
-        conn.execute(sql, (userid,))
-        conn.commit()
+        execute_query(sql, (userid,), False, False, True)
         sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
-        cartid = conn.execute(sql, (userid,)).fetchone()
+        cartid = execute_query(sql, (userid,), True, False, False)
         cartid = cartid[0]
 
     # SQL query that gathers all the items from the cart
@@ -265,14 +231,14 @@ def view_current_cart():
         JOIN Soap ON Soap.soapid = CartItem.soapid
         WHERE CartItem.cartid = ?
         """
-    cart_items = conn.execute(sql, (cartid,)).fetchall()
+    cart_items = execute_query(sql, (cartid,), False, True, False)
 
     # Calculating the total price for all the items in the cart
     total_price = sum(
         item[2] * item[3]  # item[2] is unit_price, item[3] is soap_quantity
         for item in cart_items
     )
-
+    # Formatting the price to 2dp
     total_price = "{:.2f}".format(total_price)
 
     # Format each item with its total price
@@ -286,8 +252,6 @@ def view_current_cart():
         }
         for item in cart_items
     ]
-
-    conn.close()
 
     # Return cart.html
     return render_template(
@@ -313,32 +277,32 @@ def add_to_cart():
         flash("No item specified to add to cart")
         return redirect(redirect_url or url_for('search'))
 
-    conn = sqlite3.connect("Soap.db")
     try:
         # Get the open cart for the user
         sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
-        cart = conn.execute(sql, (userid,)).fetchone()
+        cart = execute_query(sql, (userid,), True, False, False)
 
         if not cart:
             # No open cart exists, create a new one
             sql = """INSERT INTO Cart (userid, order_date, status)
                      VALUES (?, datetime('now'), 'open')"""
-            conn.execute(sql, (userid,))
-            conn.commit()
+            execute_query(sql, (userid,), False, False, True)
             # Fetch the newly created cartid
             sql = """SELECT cartid FROM Cart
             WHERE userid = ? AND status = 'open'"""
-            cart = conn.execute(sql, (userid,)).fetchone()
+            cart = execute_query(sql, (userid,), True, False, False)
 
         cartid = cart[0]
 
         # Check if the item already exists in the cart
         sql = "SELECT quantity FROM CartItem WHERE cartid = ? AND soapid = ?"
-        existing_item = conn.execute(sql, (cartid, soapid)).fetchone()
+        existing_item = execute_query(sql, (cartid, soapid),
+                                      True, False, False)
 
         # Fetch the soap name
         sql = "SELECT name FROM Soap WHERE soapid = ?"
-        soap_name_result = conn.execute(sql, (soapid,)).fetchone()
+        soap_name_result = execute_query(sql, (soapid,), True, False, False)
+
         if soap_name_result:
             soap_name = soap_name_result[0]
         else:
@@ -349,22 +313,20 @@ def add_to_cart():
             new_quantity = int(existing_item[0]) + 1
             sql = """UPDATE CartItem SET quantity = ?
                      WHERE cartid = ? AND soapid = ?"""
-            conn.execute(sql, (new_quantity, cartid, soapid))
+            execute_query(sql, (new_quantity, cartid, soapid),
+                          False, False, True)
         else:
             # Item does not exist, insert a new record
             sql = """INSERT INTO CartItem (cartid, soapid, quantity)
                      VALUES (?, ?, 1)"""
-            conn.execute(sql, (cartid, soapid))
+            execute_query(sql, (cartid, soapid), False, False, True)
 
-        conn.commit()
         flash(f'{soap_name} added to cart', 'success')
 
     except Exception as e:
         # Log the error and provide feedback
         app.logger.error(f"Error adding to cart: {e}")
         flash("An error occurred while adding the item to the cart", 'error')
-    finally:
-        conn.close()
 
     return redirect(redirect_url or url_for('search'))
 
@@ -380,34 +342,28 @@ def complete_order(cartid):
         flash("Please log in to complete your order.")
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("Soap.db")
-
     # SQL query that checks if the cart exists and is open
     sql = """SELECT * FROM Cart WHERE cartid = ?
     AND userid = ? AND status = 'open'"""
-    cart = conn.execute(sql, (cartid, userid)).fetchone()
+    cart = execute_query(sql, (cartid, userid), True, False, False)
 
     if not cart:
         # If the cart doesn't exist, show error page
-        conn.close()
         return render_template('404.html'), 404
 
     # SQL query to check if there are any items in the cart
     sql = "SELECT COUNT(*) FROM CartItem WHERE cartid = ?"
-    item_count = conn.execute(sql, (cartid,)).fetchone()[0]
+    item_count = execute_query(sql, (cartid,), True, False, False)[0]
 
     if item_count == 0:
         # If there are no items in the cart, inform the user
-        conn.close()
         flash("Your cart is empty. \
               You cannot complete an order without items.")
         return redirect(url_for("view_current_cart"))
 
     # SQL query sets the status of current cart to completed
     sql = "UPDATE Cart SET status = 'completed' WHERE cartid = ?"
-    conn.execute(sql, (cartid,))
-    conn.commit()
-    conn.close()
+    execute_query(sql, (cartid,), False, False, True)
 
     # Tell user order is successfully marked complete, return cart.html
     flash("Order completed!")
@@ -423,16 +379,12 @@ def view_previous_order(cartid):
         flash("Please log in to view your previous order")
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("Soap.db")
-
     # Check if the cart belongs to the user and is completed
     sql = "SELECT status FROM Cart WHERE cartid = ? AND userid = ?"
-    result = conn.execute(sql, (cartid, userid)).fetchone()
+    result = execute_query(sql, (cartid, userid), True, False, False)
 
     if not result or result[0] != 'completed':
-        flash("You are not authorized to view this\
-              order or it does not exist.")
-        return redirect(url_for("previous_carts"))
+        return render_template('404.html'), 404
 
     # SQL query that gathers all the items from the cart
     sql = """
@@ -444,14 +396,13 @@ def view_previous_order(cartid):
         JOIN Soap ON Soap.soapid = CartItem.soapid
         WHERE CartItem.cartid = ?
         """
-    cart_items = conn.execute(sql, (cartid,)).fetchall()
-
+    cart_items = execute_query(sql, (cartid,), False, True, False)
     # Calculating the total price for all the items in the cart
     total_price = sum(
         item[2] * item[3]  # item[2] is unit_price, item[3] is soap_quantity
         for item in cart_items
     )
-
+    # Format total price to 2 dp
     total_price = "{:.2f}".format(total_price)
 
     # Format each item with its total price
@@ -465,9 +416,10 @@ def view_previous_order(cartid):
         }
         for item in cart_items
     ]
-
     cart_quantities = {}
+
     userid = session.get('userid')
+
     if userid:
         # Query to get cart quantities for the logged-in user
         sql = """SELECT soapid, quantity
@@ -477,10 +429,8 @@ def view_previous_order(cartid):
                      FROM Cart
                      WHERE userid = ? AND status = 'open'
                  )"""
-        items = conn.execute(sql, (userid,)).fetchall()
+        items = execute_query(sql, (userid,), False, True, False)
         cart_quantities = {item[0]: item[1] for item in items}
-
-    conn.close()
 
     # Return view_previous_order.html
     return render_template(
@@ -500,10 +450,8 @@ def previous_carts():
         flash("Please log in to view your previous carts")
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("Soap.db")
     sql = "SELECT * FROM Cart WHERE userid = ? AND status = 'completed'"
-    completed_carts = conn.execute(sql, (userid,)).fetchall()
-    conn.close()
+    completed_carts = execute_query(sql, (userid,), False, True, False)
 
     return render_template("previous_carts.html",
                            completed_carts=completed_carts)
@@ -516,8 +464,6 @@ def search():
     search_term = request.args.get("search_term", "").strip()
     filter_option = request.args.get("filter", "").strip()
     sort_option = request.args.get("sort", "").strip()
-
-    conn = sqlite3.connect("Soap.db")
 
     # Start constructing the SQL query
     sql = "SELECT * FROM Soap WHERE name LIKE ? OR description LIKE ?"
@@ -547,8 +493,7 @@ def search():
         sql += " ORDER BY soapid ASC"
 
     # Execute the query with the constructed SQL and parameters
-    results = conn.execute(sql, params).fetchall()
-
+    results = execute_query(sql, params, False, True, False)
     # Prepare cart quantities
     cart_quantities = {}
     userid = session.get('userid')
@@ -561,10 +506,8 @@ def search():
                      FROM Cart
                      WHERE userid = ? AND status = 'open'
                  )"""
-        items = conn.execute(sql, (userid,)).fetchall()
+        items = execute_query(sql, (userid,), False, True, False)
         cart_quantities = {item[0]: item[1] for item in items}
-
-    conn.close()
 
     # Render the template with results and cart quantities
     return render_template("search.html",
@@ -584,43 +527,35 @@ def decrease_quantity(soapid):
         flash("Please log in to update your cart")
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("Soap.db")
-
     # Get or create an open cart
     sql = "SELECT cartid FROM Cart WHERE userid = ? AND status = 'open'"
-    cart = conn.execute(sql, (userid,)).fetchone()
+    cart = execute_query(sql, (userid,), True, False, False)
 
     if not cart:
         sql = """INSERT INTO Cart (userid, order_date, status)
                 VALUES (?, datetime('now'), 'open')"""
-        conn.execute(sql, (userid, ))
-        conn.commit()
-        cart = conn.execute("SELECT cartid FROM Cart WHERE userid = ?\
-                            AND status = 'open'", (userid,)).fetchone()
+        execute_query(sql, (userid,), False, False, True)
+        sql = "SELECT cartid FROM Cart WHERE userid = ?\
+                            AND status = 'open'"
+        cart = execute_query(sql, (userid,), True, False, False)
 
     cartid = cart[0]
-
     # Get the cart item
     sql = "SELECT quantity FROM CartItem WHERE cartid = ? AND soapid = ?"
-    cart_item = conn.execute(sql, (cartid, soapid)).fetchone()
+    cart_item = execute_query(sql, (cartid, soapid), True, False, False)
 
     if not cart_item:
         flash("Item not found")
-        conn.close()
         return redirect(url_for("view_current_cart"))
 
     new_quantity = cart_item[0] - 1
-
     if new_quantity > 0:
         sql = """UPDATE CartItem SET quantity = ?
                  WHERE cartid = ? AND soapid = ?"""
-        conn.execute(sql, (new_quantity, cartid, soapid))
+        execute_query(sql, (new_quantity, cartid, soapid), False, False, True)
     else:
         sql = "DELETE FROM CartItem WHERE cartid = ? AND soapid = ?"
-        conn.execute(sql, (cartid, soapid))
-
-    conn.commit()
-    conn.close()
+        execute_query(sql, (cartid, soapid), False, False, True)
 
     flash("Cart updated")
 
@@ -648,7 +583,7 @@ def update_info(field):
 
     # Check if the field is valid
     if field not in valid_fields:
-        flash("Invalid field specified.", "danger")
+        flash("Invalid field specified.", "error")
         return redirect(url_for('userinfo', userid=userid))
 
     if request.method == 'POST':
@@ -675,19 +610,16 @@ def update_info(field):
                                        userid=userid,
                                        valid_fields=valid_fields)
 
-            conn = sqlite3.connect('Soap.db')
-            cursor = conn.cursor()
-
-            # Update address fields in the database
-            cursor.execute("""
+            sql = """
                 UPDATE User
                 SET housenum = ?, street = ?, suburb = ?, town = ?, region = ?,
                            country = ?, postcode = ?
                 WHERE userid = ?
-            """, (housenum, street, suburb, town, region, country,
-                  postcode, userid))
-            conn.commit()
-            conn.close()
+            """,
+            execute_query(sql,
+                          (housenum, street, suburb,
+                           town, region, country, postcode, userid),
+                          False, False, True)
 
             flash("Address updated successfully.", "success")
             return redirect(url_for('userinfo', userid=userid))
@@ -697,18 +629,6 @@ def update_info(field):
         confirm_password = request.form.get('confirm-password')
 
         if new_value:
-            conn = sqlite3.connect('Soap.db')
-            cursor = conn.cursor()
-
-            # Validation for alphabetic fields
-            if not re.match(r"^[A-Za-z\s!@#$%^&*(),.?\":{}|<>]+$", new_value)\
-                    and field != 'email' and field != 'password':
-                flash("You can only input letters, spaces,\
-                      and certain symbols in this field.")
-                return render_template('update_info.html', field=field,
-                                       userid=userid,
-                                       valid_fields=valid_fields)
-
             # Special handling for password
             if field == 'password':
                 if len(new_value) < 5 or len(new_value) > 50:
@@ -721,16 +641,16 @@ def update_info(field):
                     return render_template('update_info.html', field=field,
                                            userid=userid,
                                            valid_fields=valid_fields)
-
                 new_value = generate_password_hash(new_value)
 
             # Special handling for email
             elif field == 'email':
-                existing = cursor.execute("SELECT * FROM User WHERE email = ?",
-                                          (new_value,)).fetchone()
-                if not existing:
-                    if len(new_value) < 10 or len(new_value) > 50:
-                        flash("Your email must be between 10-50 characters")
+                sql = "SELECT * FROM User WHERE email = ?"
+                used_email = execute_query(sql, (new_value,),
+                                           True, False, False)
+                if not used_email:
+                    if len(new_value) < 5 or len(new_value) > 50:
+                        flash("Your email must be between 5-50 characters")
                         return render_template('update_info.html', field=field,
                                                userid=userid,
                                                valid_fields=valid_fields)
@@ -742,18 +662,13 @@ def update_info(field):
 
             # Validation for first name and last name
             elif field == 'fname' or field == 'lname':
-                if len(new_value) < 2 or len(new_value) > 50:
-                    flash("Input must be between 2-50 characters.")
+                if len(new_value) > 50:
+                    flash("Input must be between 1-50 characters.")
                     return render_template('update_info.html', field=field,
                                            userid=userid,
                                            valid_fields=valid_fields)
-
             # Update the specific field in the database
-            cursor.execute(f"UPDATE User SET {field} = ? WHERE userid = ?",
-                           (new_value, userid))
-            conn.commit()
-            conn.close()
-
+            execute_query(sql, (new_value, userid), False, False, True)
             flash(f"{valid_fields[field]} updated successfully.", "success")
             return redirect(url_for('userinfo', userid=userid))
 
@@ -768,19 +683,13 @@ def delete_account():
     userid = session.get('userid')
 
     if not userid:
-        flash("Please log in to manage your account.", "warning")
+        flash("Please log in to manage your account.", "error")
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        # Delete the user's account from the database
-        conn = sqlite3.connect('Soap.db')
-        cursor = conn.cursor()
-
-        # Delete the user from the User table
-        cursor.execute("DELETE FROM User WHERE userid = ?", (userid,))
-        conn.commit()
-        conn.close()
-
+        # Deletes the user from the User table
+        sql = "DELETE FROM User WHERE userid = ?"
+        execute_query(sql, (userid,), False, False, True)
         # Clear the session after account deletion
         session.clear()
         flash("Your account has been successfully deleted.", "success")
