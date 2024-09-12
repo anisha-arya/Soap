@@ -471,18 +471,16 @@ def search():
 
     # Apply filter if one is selected
     if filter_option:
-        if filter_option == "bar":
+        if filter_option == 'bar':
             sql += " AND type = ?"
             params.append("Bar")
-        elif filter_option == "liquid":
+        elif filter_option == 'liquid':
             sql += " AND type = ?"
             params.append("Liquid")
 
     # Apply sorting based on the selected sort option
     if sort_option:
-        if sort_option == "relevance":
-            sql += " ORDER BY soapid ASC"
-        elif sort_option == "ascending":
+        if sort_option == "ascending":
             sql += " ORDER BY price ASC"
         elif sort_option == "descending":
             sql += " ORDER BY price DESC"
@@ -493,7 +491,7 @@ def search():
         sql += " ORDER BY soapid ASC"
 
     # Execute the query with the constructed SQL and parameters
-    results = execute_query(sql, params, False, True, False)
+    results = execute_query(sql, (params), False, True, False)
     # Prepare cart quantities
     cart_quantities = {}
     userid = session.get('userid')
@@ -615,7 +613,7 @@ def update_info(field):
                 SET housenum = ?, street = ?, suburb = ?, town = ?, region = ?,
                            country = ?, postcode = ?
                 WHERE userid = ?
-            """,
+            """
             execute_query(sql,
                           (housenum, street, suburb,
                            town, region, country, postcode, userid),
@@ -668,6 +666,7 @@ def update_info(field):
                                            userid=userid,
                                            valid_fields=valid_fields)
             # Update the specific field in the database
+            sql = f"UPDATE User SET {field} = ? WHERE userid = ?"
             execute_query(sql, (new_value, userid), False, False, True)
             flash(f"{valid_fields[field]} updated successfully.", "success")
             return redirect(url_for('userinfo', userid=userid))

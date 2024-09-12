@@ -21,18 +21,12 @@
                         <a href="{{ url_for('search', search_term=search_term, filter='liquid', sort=sort_option) }}">
                             Liquid soaps
                         </a>
-                    </li>
+                    </li>                    
                 </ul>
             </li>
             <li class="sort-dropdown">
                 <button class="sort-button">Sort <i class="fa fa-unsorted"></i></button>
                 <ul class="search-dropdown-content">
-                    <li>
-                        <a
-                            href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='relevance') }}">
-                            Relevance
-                        </a>
-                    </li>
                     <li>
                         <a
                             href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='ascending') }}">
@@ -60,7 +54,7 @@
 
     <!-- Clear Filters Link -->
     <li class="clear-filters">
-        <a href="{{ url_for('search', search_term=search_term) }}">Clear Filters</a>
+        <p><a href="{{ url_for('search', search_term=search_term) }}">Clear filters</a></p>
     </li>
 
     {% if results and results|length > 0 %}
