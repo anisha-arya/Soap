@@ -66,7 +66,17 @@ def inject_user_firstname():
 # Home page route
 @app.route("/")
 def home():
-    return render_template("home.html")
+    # Fetch featured items (e.g., top 3 items)
+    featured_sql = "SELECT name, picture, description\
+        FROM Soap WHERE is_featured=1"
+    featured_items = execute_query(featured_sql, fetchall=True)
+
+    # Fetch other items for the gallery
+    sql = "SELECT name, picture FROM Soap"
+    items = execute_query(sql, fetchall=True)
+
+    return render_template("home.html", featured_items=featured_items,
+                           items=items)
 
 
 # Login route
@@ -462,21 +472,11 @@ def previous_carts():
 def search():
     # Get the search term, filter, and sort parameters from the URL
     search_term = request.args.get("search_term", "").strip()
-    filter_option = request.args.get("filter", "").strip()
     sort_option = request.args.get("sort", "").strip()
 
     # Start constructing the SQL query
     sql = "SELECT * FROM Soap WHERE name LIKE ? OR description LIKE ?"
     params = [f"%{search_term}%", f"%{search_term}%"]
-
-    # Apply filter if one is selected
-    if filter_option:
-        if filter_option == 'bar':
-            sql += " AND type = ?"
-            params.append("Bar")
-        elif filter_option == 'liquid':
-            sql += " AND type = ?"
-            params.append("Liquid")
 
     # Apply sorting based on the selected sort option
     if sort_option:
@@ -511,7 +511,6 @@ def search():
     return render_template("search.html",
                            results=results,
                            search_term=search_term,
-                           filter_option=filter_option,
                            sort_option=sort_option,
                            cart_quantities=cart_quantities)
 
@@ -706,6 +705,11 @@ def about():
 @app.route("/faqs")
 def faqs():
     return render_template("faqs.html")
+
+
+@app.route("/credits")
+def credit():
+    return render_template("credit.html")
 
 
 @app.errorhandler(404)
