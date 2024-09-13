@@ -4,61 +4,76 @@
 
 {% block content %}
 <!-- Hero Section -->
-<div class="hero-section">
-    <h1>Welcome to Soaporium</h1>
-    <p>Discover our amazing products</p>
-    <br><hr>
+<div class="home-page">
+    <div class="hero-section">
+        <h1>Welcome to Soaporium</h1>
+        <p>Discover our amazing handcrafted soaps</p>
+    </div>
+
+    <!-- Featured Soaps Carousel -->
+    <div class="featured-soaps">
+        <h2>Featured Soaps</h2>
+        <div class="carousel-container">
+            <div class="carousel">
+                {% for item in featured_items %}
+                <div class="carousel-item">
+                    <a href="{{ url_for('search', search_term=item[0]) }}">
+                        <img src="{{ item[1] }}" alt="{{ item[0] }}">
+                        <h3>{{ item[0] }}</h3>
+                        <p>{{ item[2] }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control prev" onclick="moveCarousel(-1)">❮</button>
+            <button class="carousel-control next" onclick="moveCarousel(1)">❯</button>
+        </div>
+    </div>
+
+    <!-- Soap Gallery Section -->
+    <div class="gallery-section">
+        <h2>Soap Gallery</h2>
+        <div class="gallery-items">
+            {% for item in items %}
+            <div class="gallery-item">
+                <a href="{{ url_for('search', search_term=item[0]) }}">
+                    <img src="{{ item[1] }}" alt="{{ item[0] }}">
+                    <h4>{{ item[0] }}</h4>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 </div>
 
-<!-- Clickable Search Items -->
-<div class="home-items">
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='') }}">
-            <img src="" alt="">
-            <h2>All soaps</h2>
-        </a>
-    </div>
+<!-- JavaScript for Carousel, thanks to ChatGPT -->
+<script>
+    let currentIndex = 0;
 
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='mint') }}">
-            <img src="" alt="">
-            <h2>Mint</h2>
-        </a>
-    </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='lavender') }}">
-            <img src="" alt="">
-            <h2>Lavender</h2>
-        </a>
-    </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='shea') }}">
-            <img src="" alt="">
-            <h2>Shea</h2>
-        </a>
-    </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='charcoal') }}">
-            <img src="" alt="">
-            <h2>Charcoal</h2>
-        </a>
-    </div>
-    <div class="hitem">
-        <a href="{{ url_for('search', search_term='citrus') }}">
-            <img src="" alt="">
-            <h2>Citrus</h2>
-        </a>
-    </div>
-</div>
+    function moveCarousel(direction) {
+        const carousel = document.querySelector('.carousel');
+        const items = document.querySelectorAll('.carousel-item');
+        const totalItems = items.length;
 
-<!-- Flash Messages for Errors or Other Notifications -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul class="flash-messages">
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+        // Calculate the new index
+        currentIndex = (currentIndex + direction + totalItems) % totalItems;
+
+        // Move the carousel
+        carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    // Optional: Auto-scroll carousel every 5 seconds
+    setInterval(() => moveCarousel(1), 5000);
+</script>
 {% endblock %}
