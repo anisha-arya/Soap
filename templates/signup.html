@@ -37,13 +37,16 @@
 
     {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
-    <ul class="flash-messages">
+    <div class="flash-messages">
         {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
+        <div class="alert {{ category }}">
+            {{ message }}
+        </div>
         {% endfor %}
-    </ul>
+    </div>
     {% endif %}
     {% endwith %}
+
 
     <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
 </div>

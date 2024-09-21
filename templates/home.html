@@ -10,51 +10,52 @@
         <p>Discover our amazing handcrafted soaps</p>
     </div>
 
-    <!-- Featured Soaps Carousel -->
-    <div class="featured-soaps">
-        <h2>Featured Soaps</h2>
-        <div class="carousel-container">
-            <div class="carousel">
-                {% for item in featured_items %}
-                <div class="carousel-item">
-                    <a href="{{ url_for('search', search_term=item[0]) }}">
-                        <img src="{{ item[1] }}" alt="{{ item[0] }}">
-                        <h3>{{ item[0] }}</h3>
-                        <p>{{ item[2] }}</p>
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-            <button class="carousel-control prev" onclick="moveCarousel(-1)">❮</button>
-            <button class="carousel-control next" onclick="moveCarousel(1)">❯</button>
-        </div>
-    </div>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="alert {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}  
 
-    <!-- Soap Gallery Section -->
-    <div class="gallery-section">
-        <h2>Soap Gallery</h2>
-        <div class="gallery-items">
-            {% for item in items %}
-            <div class="gallery-item">
+<!-- Featured Soaps Carousel -->
+<div class="featured-soaps">
+    <h2>Featured Soaps</h2>
+    <div class="carousel-container">
+        <div class="carousel">
+            {% for item in featured_items %}
+            <div class="carousel-item">
                 <a href="{{ url_for('search', search_term=item[0]) }}">
                     <img src="{{ item[1] }}" alt="{{ item[0] }}">
-                    <h4>{{ item[0] }}</h4>
+                    <h3>{{ item[0] }}</h3>
+                    <p>{{ item[2] }}</p>
                 </a>
             </div>
             {% endfor %}
         </div>
+        <button class="carousel-control prev" onclick="moveCarousel(-1)">❮</button>
+        <button class="carousel-control next" onclick="moveCarousel(1)">❯</button>
     </div>
+</div>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
+<!-- Soap Gallery Section -->
+<div class="gallery-section">
+    <h2>Soap Gallery</h2>
+    <div class="gallery-items">
+        {% for item in items %}
+        <div class="gallery-item">
+            <a href="{{ url_for('search', search_term=item[0]) }}">
+                <img src="{{ item[1] }}" alt="{{ item[0] }}">
+                <h4>{{ item[0] }}</h4>
+            </a>
+        </div>
         {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
+    </div>
 </div>
 
 <!-- JavaScript for Carousel, thanks to ChatGPT -->

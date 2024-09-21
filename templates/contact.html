@@ -9,13 +9,15 @@
     <p>Got any questions, queries, or concerns? Fill out the details below and we'll get back to you as soon as
         possible!</p>
     <!-- Flash Messages for Errors or Other Notifications -->
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
-    <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert {{ category }}">
+            {{ message }}
+        </div>
         {% endfor %}
-    </ul>
+    </div>
     {% endif %}
     {% endwith %}
 

@@ -13,6 +13,11 @@
                 <button class="sort-button">Sort <i class="fa fa-unsorted"></i></button>
                 <ul class="search-dropdown-content">
                     <li>
+                        <a href="{{ url_for('search', search_term=search_term, sort='alpha') }}">
+                            Alphabetical
+                        </a>
+                    </li>
+                    <li>
                         <a
                             href="{{ url_for('search', search_term=search_term, sort='ascending') }}">
                             Price: $-$$$
@@ -20,13 +25,8 @@
                     </li>
                     <li>
                         <a
-                            href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='descending') }}">
+                            href="{{ url_for('search', search_term=search_term, sort='descending') }}">
                             Price: $$$-$
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('search', search_term=search_term, filter=filter_option, sort='alpha') }}">
-                            Alphabetical
                         </a>
                     </li>
                 </ul>
