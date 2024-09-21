@@ -32,10 +32,21 @@
         <input type="text" id="subject" name="subject" maxlength="50" required>
 
         <label for="message">Message</label>
-        <textarea id="message" name="message" maxlength="1000" rows="5" required></textarea>
+        <textarea id="message" name="message" maxlength="1000" rows="5" required oninput="updateCounter()"></textarea>
+        <div id="charCount">1000 characters remaining</div>
 
         <button type="submit" class="submit-button">Send message</button>
     </form>
-
 </div>
+
+<!--ChatGPT-generated Javascript-->
+<script>
+    function updateCounter() {
+        const textarea = document.getElementById('message');
+        const charCount = document.getElementById('charCount');
+        const remaining = 1000 - textarea.value.length;
+        charCount.textContent = remaining + ' characters remaining';
+    }
+</script>
+
 {% endblock %}
