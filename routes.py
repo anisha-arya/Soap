@@ -98,7 +98,7 @@ def login():
             session["userid"] = user[0]
             return redirect(url_for("home"))
         else:
-            flash("Incorrect email or password")
+            flash("Incorrect email or password", 'error')
 
     return render_template("login.html")
 
@@ -140,7 +140,7 @@ def signup():
         execute_query(sql,
                       (fname, lname, email, generate_password_hash(password)),
                       False, False, True)
-        flash("Thanks for signing up! Please log in.")
+        flash("Thanks for signing up! Please log in.", 'success')
         return redirect(url_for("login"))
 
     return render_template("signup.html")
@@ -152,7 +152,7 @@ def logout():
     # If user wants to logout, clear the data from their session
     session.clear()
     # Tell the user they've been logged out
-    flash("You have been signed out")
+    flash("You have been signed out", 'success')
     # Return home.html
     return redirect(url_for("home"))
 
@@ -164,7 +164,7 @@ def userinfo():
     userid = session.get("userid")
 
     if not userid:
-        flash("Please login to access your information")
+        flash("Please login to access your information", 'message')
         return render_template("login.html")
 
     # SQL query that gathers all the user's data
@@ -212,7 +212,7 @@ def view_current_cart():
 
     if not userid:
         # If there isn't a user logged in, tell user to login
-        flash("Please log in to view your cart")
+        flash("Please log in to view your cart", 'message')
         # Return login.html
         return redirect(url_for("login"))
 
@@ -277,14 +277,14 @@ def view_current_cart():
 def add_to_cart():
     userid = session.get("userid")
     if not userid:
-        flash("Please log in to add items to your cart")
+        flash("Please log in to add items to your cart", 'message')
         return redirect(url_for("login"))
 
     soapid = request.form.get("soapid")
     redirect_url = request.form.get("redirect_url")
 
     if not soapid:
-        flash("No item specified to add to cart")
+        flash("No item specified to add to cart", 'error')
         return redirect(redirect_url or url_for('search'))
 
     try:
@@ -349,7 +349,7 @@ def complete_order(cartid):
 
     if not userid:
         # If there isn't a user logged in, prompt login
-        flash("Please log in to complete your order.")
+        flash("Please log in to complete your order.", 'message')
         return redirect(url_for("login"))
 
     # SQL query that checks if the cart exists and is open
@@ -368,7 +368,7 @@ def complete_order(cartid):
     if item_count == 0:
         # If there are no items in the cart, inform the user
         flash("Your cart is empty. \
-              You cannot complete an order without items.")
+              You cannot complete an order without items.", 'error')
         return redirect(url_for("view_current_cart"))
 
     # SQL query sets the status of current cart to completed
@@ -376,7 +376,7 @@ def complete_order(cartid):
     execute_query(sql, (cartid,), False, False, True)
 
     # Tell user order is successfully marked complete, return cart.html
-    flash("Order completed!")
+    flash("Order completed!", 'success')
     return redirect(url_for("view_current_cart"))
 
 
@@ -386,7 +386,7 @@ def view_previous_order(cartid):
     userid = session.get("userid")
 
     if not userid:
-        flash("Please log in to view your previous order")
+        flash("Please log in to view your previous order", 'message')
         return redirect(url_for("login"))
 
     # Check if the cart belongs to the user and is completed
@@ -457,7 +457,7 @@ def previous_carts():
     userid = session.get("userid")
 
     if not userid:
-        flash("Please log in to view your previous carts")
+        flash("Please log in to view your previous carts", 'message')
         return redirect(url_for("login"))
 
     sql = "SELECT * FROM Cart WHERE userid = ? AND status = 'completed'"
@@ -521,7 +521,7 @@ def decrease_quantity(soapid):
     userid = session.get("userid")
 
     if not userid:
-        flash("Please log in to update your cart")
+        flash("Please log in to update your cart", 'message')
         return redirect(url_for("login"))
 
     # Get or create an open cart
@@ -542,7 +542,7 @@ def decrease_quantity(soapid):
     cart_item = execute_query(sql, (cartid, soapid), True, False, False)
 
     if not cart_item:
-        flash("Item not found")
+        flash("Item not found", 'error')
         return redirect(url_for("view_current_cart"))
 
     new_quantity = cart_item[0] - 1
@@ -554,7 +554,7 @@ def decrease_quantity(soapid):
         sql = "DELETE FROM CartItem WHERE cartid = ? AND soapid = ?"
         execute_query(sql, (cartid, soapid), False, False, True)
 
-    flash("Cart updated")
+    flash("Cart updated", 'success')
 
     # Get the redirect URL from the form
     redirect_url = request.form.get("redirect_url")
@@ -566,7 +566,7 @@ def update_info(field):
     userid = session.get('userid')
 
     if not userid:
-        flash("Please log in to manage your account.", "warning")
+        flash("Please log in to manage your account.", "message")
         return redirect(url_for('login'))
 
     # Define valid fields
@@ -629,7 +629,8 @@ def update_info(field):
             # Special handling for password
             if field == 'password':
                 if len(new_value) < 5 or len(new_value) > 50:
-                    flash("Your new password must be between 5-50 characters.")
+                    flash("Your new password must be between 5-50 characters.",
+                          'message')
                     return render_template('update_info.html', field=field,
                                            userid=userid,
                                            valid_fields=valid_fields)
@@ -647,12 +648,14 @@ def update_info(field):
                                            True, False, False)
                 if not used_email:
                     if len(new_value) < 5 or len(new_value) > 50:
-                        flash("Your email must be between 5-50 characters")
+                        flash("Your email must be between 5-50 characters",
+                              'message')
                         return render_template('update_info.html', field=field,
                                                userid=userid,
                                                valid_fields=valid_fields)
                 else:
-                    flash("This email is already in use, please try again.")
+                    flash("This email is already in use, please try again.",
+                          'error')
                     return render_template('update_info.html', field=field,
                                            userid=userid,
                                            valid_fields=valid_fields)
@@ -660,7 +663,7 @@ def update_info(field):
             # Validation for first name and last name
             elif field == 'fname' or field == 'lname':
                 if len(new_value) > 50:
-                    flash("Input must be between 1-50 characters.")
+                    flash("Input must be between 1-50 characters.", 'message')
                     return render_template('update_info.html', field=field,
                                            userid=userid,
                                            valid_fields=valid_fields)
