@@ -18,14 +18,12 @@
                         </a>
                     </li>
                     <li>
-                        <a
-                            href="{{ url_for('search', search_term=search_term, sort='ascending') }}">
+                        <a href="{{ url_for('search', search_term=search_term, sort='ascending') }}">
                             Price: $-$$$
                         </a>
                     </li>
                     <li>
-                        <a
-                            href="{{ url_for('search', search_term=search_term, sort='descending') }}">
+                        <a href="{{ url_for('search', search_term=search_term, sort='descending') }}">
                             Price: $$$-$
                         </a>
                     </li>
@@ -80,18 +78,20 @@
             <!-- Flash Message for Specific Soap -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-            {% for category, message in messages %}
-            {% if item[1] in message %}
-            <ul class="flash-messages">
-                <li class="{{ category }}">{{ message }}</li>
-            </ul>
-            {% endif %}
-            {% endfor %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                {% if item[1] in message %}
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
             {% endif %}
             {% endwith %}
             <hr>
-        </li>
-        {% endfor %}
+            {% endfor %}
+            </li>
     </ul>
     {% else %}
     <p class="no-results">No results found</p> <!-- If no results, show this message -->
