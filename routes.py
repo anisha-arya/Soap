@@ -121,14 +121,13 @@ def signup():
             flash('Name must be between 1 and 50 characters.', 'error')
             return redirect(url_for('signup'))
 
-        if len(password) < 5 or len(password) > 100 or\
-                len(email) < 5 or len(email) > 100:
-            flash('Password and email must be between 5 and 100 characters.',
+        if len(password) < 5 or len(password) > 100:
+            flash('Password must be between 5 and 100 characters.',
                   'error')
             return redirect(url_for('signup'))
 
         sql = "SELECT * FROM User WHERE email = ?"
-        existing_user = execute_query(sql, (email,), True, False, False)
+        existing_user = execute_query(sql, (email,), fetchone=True)
 
         if existing_user:
             flash("Email unavailable.\
@@ -376,7 +375,8 @@ def complete_order(cartid):
     execute_query(sql, (cartid,), False, False, True)
 
     # Tell user order is successfully marked complete, return cart.html
-    flash("Order completed!", 'success')
+    flash("Order completed! To view the contents of this order, \
+          please explore your previous carts", 'success')
     return redirect(url_for("view_current_cart"))
 
 
