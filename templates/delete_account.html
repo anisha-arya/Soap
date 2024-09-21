@@ -7,7 +7,7 @@
     <h2>Are you sure you want to delete your account?</h2>
     <form method="POST">
         <button type="submit" class="confirm-delete-button">Yes, delete my account</button>
-        <a href="{{ url_for('userinfo', userid=userid) }}"><button type="button">No, take me back</button></a>
+        <a href="{{ url_for('userinfo', userid=userid) }}"><button type="button" class="delete-back-button">No, take me back</button></a>
     </form>
 </div>
 {% endblock %}
