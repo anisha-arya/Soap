@@ -18,7 +18,7 @@
                 <li class="search-bar">
                     <form action="{{ url_for('search') }}" method="get">
                         <div class="input-wrapper">
-                            <input type="text" name="search_term" placeholder="Search...">
+                            <input type="text" name="search_term" maxlength="50" placeholder="Search...">
                             <button type="submit"><i class="fa fa-search"></i></button>
                         </div>
                     </form>

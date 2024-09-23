@@ -26,6 +26,7 @@
     <p>{{ user[5] }}, {{ user[6] }}</p>
     <p>{{ user[7] }}, {{ user[8] }}</p>
     <p>{{ user[9] }}</p>
+    <br> <a href="{{ url_for('update_info', field='address') }}" class="update-link">Update address</a>
     {% else %}
     <p>Looks like you haven't filled your shipping address in. Please <a
             href="{{ url_for('update_info', field='address') }}">update your address.</a></p>
