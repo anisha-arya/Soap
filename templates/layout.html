@@ -5,13 +5,15 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Soaporium{% endblock %}</title>
+    <link rel="icon" href="/static/images/favicon.jpg" type="image/svg+xml">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
     <div class="top-bar">
-        <a href="{{ url_for('home') }}" class="home-link"><i class="fa fa-home"></i> Soaporium</a>
+        <a href="{{ url_for('home') }}" class="home-link"><img class="home-icon" src="/static/images/favicon.jpg"
+                alt="Soaporium Unicorn"> Soaporium</a>
         <nav class="navbar">
             <ul class="nav-links">
                 <!-- Search bar in the nav bar -->
