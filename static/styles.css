@@ -3,7 +3,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Gorditas:wght@400;700&display=swap');
 
 /* Global Styles */
-body {
+body,
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
     font-family: 'Lora', serif;
     background-color: #faf9f9;
     color: #2b3d41;
@@ -12,23 +16,12 @@ body {
     min-height: 100vh;
 }
 
-html, body {
-    height: 100%; /* full height for proper layout */
-    margin: 0;
-    padding: 0;
-}
-
-#message {
-    font-family: 'Lora', serif;
-}
-
 h1,
 h2,
 h3,
 h4,
 h5,
-h6,
-.home-link {
+h6 {
     font-family: "Gorditas", cursive;
     font-weight: 400;
     text-align: center;
@@ -41,9 +34,28 @@ li {
     padding: 0;
 }
 
+a {
+    color:#98c1d9;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+hr {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
+}
+
+/* Flash Messages */
 .flash-messages {
     padding: 0;
     margin: 0;
+    list-style-type: none;
 }
 
 .flash-messages .alert {
@@ -54,36 +66,25 @@ li {
     animation: flash 0.5s linear 3, fadeOut 5s linear 5s forwards;
 }
 
-/* Success message styling */
 .flash-messages .alert.success {
     background-color: #d4edda;
-    /* Light green */
     color: #155724;
-    /* Dark green */
     border: 1px solid #c3e6cb;
-    /* Darker green */
 }
 
-/* Error message styling */
 .flash-messages .alert.error {
     background-color: #f8d7da;
-    /* Light red */
     color: #721c24;
-    /* Dark red */
     border: 1px solid #f5c6cb;
-    /* Darker red */
 }
 
-/* Message class with yellow styling */
 .flash-messages .alert.message {
     background-color: #fff3cd;
-    /* Light yellow */
     color: #856404;
-    /* Dark yellow/brown */
     border: 1px solid #ffeeba;
-    /* Darker yellow */
 }
 
+/* Flash Messages Animations */
 @keyframes flash {
 
     0%,
@@ -101,17 +102,13 @@ li {
         opacity: 1;
     }
 
-    80% {
-        opacity: 0;
-    }
-
+    80%,
     100% {
         opacity: 0;
         display: none;
     }
 }
 
-/* Header and Navigation */
 /* Header and Navigation */
 .top-bar,
 .navbar {
@@ -140,16 +137,102 @@ li {
 .home-link {
     color: #fff;
     text-decoration: none;
-    font-weight: 400;
 }
 
 .nav-links a:hover {
     text-decoration: underline;
 }
 
+.home-link {
+    display: flex;
+    align-items: center;
+    font-family: "Gorditas", cursive;
+    font-weight: 400;
+    text-decoration: none;
+}
+
+.home-icon {
+    height: 25px;
+    width: auto;
+    margin-right: 5px;
+}
+
+/* User dropdown menu */
+.user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.user-dropdown-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #98c1d9;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-content {
+    visibility: hidden;
+    display: none;
+    position: absolute;
+    background-color: #98c1d9;
+    min-width: 100%;
+    z-index: 1;
+    border-radius: 3px;
+    right: 0;
+    top: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: calc(100% - 5px);
+}
+
+.user-dropdown:hover .dropdown-content {
+    visibility: visible;
+    display: block;
+}
+
+.dropdown-content ul {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-content li {
+    width: 100%;
+}
+
+.dropdown-content a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    text-align: center;
+}
+
+.dropdown-content a:hover,
+.user-dropdown-btn:hover {
+    background-color: #2b3d41;
+    text-decoration: none;
+}
+
 /* Search Bar */
 .search-bar {
     max-width: 300px;
+}
+
+.input-wrapper,
+.update-form {
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 input[type="text"],
@@ -159,13 +242,6 @@ input[type="password"] {
     border: 1px solid #ddd;
     width: 100%;
     box-sizing: border-box;
-}
-
-.input-wrapper,
-.update-form {
-    display: flex;
-    align-items: center;
-    width: 100%;
 }
 
 .input-wrapper input {
@@ -198,7 +274,7 @@ input[type="password"] {
     font-size: 1.2rem;
 }
 
-/* Home Page Items */
+/* Home Page Styles */
 .home-items {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -275,14 +351,6 @@ input[type="password"] {
 }
 
 /* Gallery Item Image Styling */
-.gallery-item img {
-    width: 100%;
-    height: 150px;
-    /* Fixed height */
-    object-fit: cover;
-    /* Ensures images cover the container without distortion */
-}
-
 .gallery-items {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -290,12 +358,18 @@ input[type="password"] {
     padding: 10px;
 }
 
+.gallery-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
 /* Footer */
 .footer {
     background-color: #2b3d41;
     color: #faf9f9;
     text-align: center;
-    padding: 10px 0; /* vertical padding */
+    padding: 10px 0;
     width: 100%;
     bottom: 0;
     margin-top: auto;
@@ -317,16 +391,25 @@ input[type="password"] {
     font-size: 0.8rem;
 }
 
-/* Login and Signup Containers */
+/* Login and Signup Forms */
 .login-container,
-.signup-container {
+.signup-container,
+.about-page,
+.faqs-page,
+.cart-container,
+.contact-form-container,
+.user-info-container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: auto;
     padding: 20px;
     background-color: #faf9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.about-page {
+    margin-top: 25px;
 }
 
 .login-container {
@@ -359,6 +442,37 @@ input[type="password"] {
 }
 
 /* Search Results */
+.search-form {
+    min-width: 100%;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.search-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.sort-dropdown:hover .search-dropdown-content,
+.sort-dropdown:hover .search-dropdown-content {
+    display: block;
+}
+
+.search-dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.search-dropdown-content a:hover {
+    background-color: #ddd;
+}
+
 .search-results-container {
     width: 100%;
     max-width: 1200px;
@@ -384,7 +498,6 @@ input[type="password"] {
 }
 
 .result-item {
-    box-sizing: border-box;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -395,10 +508,12 @@ input[type="password"] {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+    box-sizing: border-box;
 }
 
 .result-item p {
     margin-bottom: 1em;
+    flex-grow: 1;
 }
 
 .result-item h2 {
@@ -409,84 +524,37 @@ input[type="password"] {
     display: block;
     width: 100%;
     height: 200px;
-    object-fit: cover;
-    border-radius: 5px;
     margin-bottom: 10px;
+    object-fit: cover;
 }
 
-.description,
-.price {
-    margin: 10px 0;
-    font-size: 1em;
+/* Quantity Buttons Alignment */
+.cart-quantity {
+    display: flex;
+    align-items: center;
 }
 
-.add-to-cart,
-.user-dropdown-btn,
-.cancel-button,
-.update-button,
-.quantity-button,
-.confirm-delete-button {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #98c1d9;
+.quantity-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
     color: #fff;
     border: none;
     border-radius: 3px;
     cursor: pointer;
-    text-decoration: none;
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
-/* Button hover effect */
-.add-to-cart:hover,
-.user-dropdown-btn:hover,
-.cancel-button:hover,
-.update-button:hover,
-.quantity-button:hover,
-.confirm-delete-button:hover {
-    background-color: #2b3d41;
-}
-
-.cart-quantity {
-    display: flex;
-    align-items: center;
-    /* Vertically align items in the center */
-    justify-content: center;
-    gap: 10px;
-    /* Space between items */
-}
-
-/* Cart Page */
-.cart-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
+/* Cart */
 .cart-item {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
     background-color: #faf9f9;
-
-}
-
-.cart-item h2 {
-    margin: 0 0 5px;
-}
-
-.cart-item p {
-    margin: 0;
-}
-
-.cart-item a {
-    color: #b5446e;
-    text-decoration: none;
-}
-
-.cart-item a:hover {
-    text-decoration: underline;
 }
 
 .total-price {
@@ -511,273 +579,68 @@ input[type="password"] {
     border-radius: 5px;
 }
 
-/* User Info Page */
-.user-info-container,
-.update-info-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-}
-
-.user-info-container h1 {
-    margin-bottom: 20px;
-}
-
-.user-info-container p {
-    margin-bottom: 10px;
-}
-
-.user-info-form {
-    margin-top: 20px;
-}
-
-.user-info-form label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.user-info-form input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    margin-bottom: 10px;
-}
-
-.user-info-form button,
-.cart-navigation button,
-.delete-back-button {
+/* Buttons */
+button,
+.btn {
     padding: 10px 20px;
-    font-size: 16px;
     background-color: #b5446e;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
+    color: #faf9f9;
+    border: 1px solid #b5446e;
+    border-radius: 5px;
     cursor: pointer;
-}
-
-.user-info-form button:hover,
-.cart-navigation button:hover,
-.delete-back-button:hover {
-    background-color: #eacbd2;
-}
-
-.login-submit {
-    padding: 3px;
     font-size: 16px;
-    background-color: #eacbd2;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-.login-submit:hover {
-    background-color: #b5446e;
-}
-
-/* User Dropdown */
-.user-dropdown {
-    position: relative;
-}
-
-.user-dropdown-btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #98c1d9;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.user-dropdown-btn:hover {
-    background-color: #2b3d41;
-}
-
-.dropdown-content {
-    visibility: hidden;
-    display: none;
-    position: absolute;
-    background-color: #98c1d9;
-    min-width: 150px;
-    z-index: 1;
-    border-radius: 3px;
-    right: 0;
-    top: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.user-dropdown:hover .dropdown-content {
-    visibility: visible;
-    display: block;
-}
-
-.dropdown-content ul {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-}
-
-.dropdown-content li {
-    width: 100%;
-}
-
-.dropdown-content a {
-    color: #fff;
-    text-decoration: none;
-    display: block;
-    padding: 10px;
-    text-align: center;
-}
-
-.dropdown-content a:hover {
-    background-color: #2b3d41;
-    text-decoration: none;
-}
-
-/* Flash Messages */
-.flash-messages {
-    list-style-type: none;
-    padding: 0;
-}
-
-.flash-messages li {
-    margin-bottom: 5px;
-    color: #d9534f;
-}
-
-hr {
-    width: 100%;
-    border: 0;
-    border-top: 1px solid #ddd;
-    margin: 10px 0;
-}
-
-/* No Results */
-.no-results {
-    font-style: italic;
-}
-
-.update-links-p {
-    display: flex;
-    flex-wrap: wrap;
-    /* Allows the links to wrap to the next line if needed */
-    gap: 10px;
-    /* Adjust spacing between links if necessary */
-    justify-content: center;
-}
-
-.back-to-home,
-.delete-account-link {
-    color: #b5446e;
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    text-decoration: none;
-    max-width: 25%;
-}
-
-.update-link,
-.clear-filters a {
-    color: #98c1d9;
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    text-decoration: none;
-    max-width: 25%;
-}
-
-.back-to-home:hover,
-.clear-filters a:hover,
-.update-link:hover,
-.delete-account-link:hover {
-    text-decoration: underline;
-}
-
-.sort-dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.sort-dropdown button:hover {
-    background-color: #b5446e;
-}
-
-.search-dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-}
-
-.filter-dropdown:hover .search-dropdown-content,
-.sort-dropdown:hover .search-dropdown-content {
-    display: block;
-}
-
-.search-dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-.search-dropdown-content a:hover {
-    background-color: #ddd;
-}
-
-/* General Styles for About and FAQs */
-.about-page h1,
-.faqs-page h1,
-.contact-form-container h1,
-.cart-container h1,
-.error-container h1,
-.credit-page h1 {
-    font-size: 2.5em;
-    text-align: center;
-    margin-top: 1em;
-    margin-bottom: 1em;
-}
-
-.about-page h2,
-.faqs-page h2,
-.credit-page h2 {
+    margin: 5px;
     font-family: 'Lora', serif;
-    font-size: 1.75em;
-    text-align: center;
-    color: #555;
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
 }
 
-.about-page p,
-.faqs-page p,
-.error-container p,
-.credit-page p {
-    font-size: 1.2em;
+button:hover,
+.btn:hover {
+    background-color: #eacbd2;
+    border-color: #eacbd2;
+}
+
+input[type="submit"] {
+    background-color: #b5446e;
+    color: #faf9f9;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #eacbd2;
+}
+
+/* Form and Input Fields */
+form {
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
     color: #2b3d41;
-    line-height: 1.6;
-    margin-bottom: 1em;
-    text-align: center;
 }
 
-/* Specific Page Styling */
-.about-page p,
-.faqs-page p,
-.credit-page p {
-    max-width: 800px;
-    margin: 0 auto;
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-family: 'Lora', serif;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
+/* Image credits page */
 .credit-header {
     margin-bottom: 10px;
 }
@@ -791,7 +654,7 @@ hr {
 
 .credit-item {
     text-align: center;
-    flex: 1 1 300px; /* Adjusts the base size and allows flexibility */
+    flex: 1 1 300px;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
@@ -800,59 +663,37 @@ hr {
 
 .credit-item a {
     text-decoration: none;
-    color:#b5446e;
+    color: #b5446e;
 }
 
 .credit-item a:hover {
     text-decoration: underline;
 }
 
-.contact-form-container {
-    max-width: 600px;
-    margin: 0 auto;
+/* Update Info Page */
+.update-container {
+    max-width: 800px;
+    margin: 50px auto;
     padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-}
-
-.contact-form-container label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.contact-form-container input,
-.contact-form-container textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
+    background-color: #faf9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.contact-form-container .submit-button,
-.back-to-home-button button {
-    background-color: #b5446e;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.back-to-home-button button {
-    position: absolute;
-    bottom: 250px;
-}
-
-.contact-form-container .submit-button:hover,
-.back-to-home-button button:hover {
-    background-color: #f5c6cb;
-}
-
-.previous-carts-list {
-    text-align: center;
+.update-form input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
     border-radius: 3px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Responsive Design */
