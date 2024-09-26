@@ -21,6 +21,7 @@
     {% endif %}
     {% endwith %}
 
+    <!-- Contact form -->
     <form action="{{ url_for('customer_service') }}" method="post">
         <label for="name">Name</label>
         <input type="text" id="name" name="name" maxlength="50" required>
@@ -39,7 +40,7 @@
     </form>
 </div>
 
-<!--ChatGPT-generated Javascript-->
+<!--ChatGPT-generated Javascript for character counter -->
 <script>
     function updateCounter() {
         const textarea = document.getElementById('message');

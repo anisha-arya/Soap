@@ -9,33 +9,32 @@
 
     {% if user %}
     <p><strong>First Name:</strong> {{ user[1] }}</p>
+    <a href="{{ url_for('update_info', field='fname') }}" class="update-link">Update first name</a>
     <p><strong>Last Name:</strong> {{ user[2] }}</p>
+    <a href="{{ url_for('update_info', field='lname') }}" class="update-link">Update last name</a>
     <p><strong>Email:</strong> {{ user[10] }}</p>
+    <a href="{{ url_for('update_info', field='email') }}" class="update-link">Update email</a> | 
+    <a href="{{ url_for('update_info', field='password') }}" class="update-link">Update password</a>
 
-    <p class="update-links-p">
-        <a href="{{ url_for('update_info', field='fname') }}" class="update-link">Update first name</a>
-        <a href="{{ url_for('update_info', field='lname') }}" class="update-link">Update last name</a>
-        <a href="{{ url_for('update_info', field='email') }}" class="update-link">Update email</a>
-        <a href="{{ url_for('update_info', field='password') }}" class="update-link">Update password</a>
-    </p>
     <hr>
 
     {% if user[3] and user[4] and user[5] and user[6] and user[7] and user[8] and user[9] %}
+    <!-- If user has provided address -->
     <p><strong>Current Shipping Address</strong></p>
     <p>{{ user[3] }} {{ user[4] }}</p>
     <p>{{ user[5] }}, {{ user[6] }}</p>
     <p>{{ user[7] }}, {{ user[8] }}</p>
     <p>{{ user[9] }}</p>
-    <br> <a href="{{ url_for('update_info', field='address') }}" class="update-link">Update address</a>
+    <a href="{{ url_for('update_info', field='address') }}" class="update-link">Update address</a>
+    
     {% else %}
     <p>Looks like you haven't filled your shipping address in. Please <a
             href="{{ url_for('update_info', field='address') }}">update your address.</a></p>
 
-    <br>
-
     {% endif %}
-    <p><a href="{{ url_for('delete_account') }}" class="delete-account-link">Delete account</a></p>
+    <br><p><a href="{{ url_for('delete_account') }}" class="delete-account-link">Delete account</a></p>
 
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
     <div class="flash-messages">
@@ -48,7 +47,7 @@
     {% endif %}
     {% endwith %}
 
-    {% endif %} <!-- Closing the if for user -->
+    {% endif %}
 
 </div>
 {% endblock %}

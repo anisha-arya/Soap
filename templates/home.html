@@ -1,3 +1,4 @@
+<!-- /templates/home.html -->
 {% extends "layout.html" %}
 
 {% block title %}Home | Soaporium{% endblock %}
@@ -74,7 +75,7 @@
         carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
     }
 
-    // Optional: Auto-scroll carousel every 5 seconds
-    setInterval(() => moveCarousel(1), 5000);
+    // Optional: Auto-scroll carousel every 8 seconds
+    setInterval(() => moveCarousel(1), 8000);
 </script>
 {% endblock %}

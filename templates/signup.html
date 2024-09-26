@@ -1,3 +1,4 @@
+<!-- /templates/signup.html -->
 {% extends "layout.html" %}
 
 {% block title %}Sign up | Soaporium{% endblock %}
@@ -7,6 +8,7 @@
     <h1>Create a New Account</h1>
 
     <form method="POST" action="{{ url_for('signup') }}" class="signup-form">
+        <!-- New account form -->
         <div class="form-group">
             <label for="fname">First Name</label>
             <input type="text" id="fname" name="fname" maxlength="50" required>
@@ -35,6 +37,7 @@
         <button class="login-submit" type="submit">Sign up</button>
     </form>
 
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
     <div class="flash-messages">
@@ -47,7 +50,7 @@
     {% endif %}
     {% endwith %}
 
-
+    <!-- Login URL-->
     <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
 </div>
 {% endblock %}

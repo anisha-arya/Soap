@@ -1,5 +1,7 @@
+<!-- /templates/update_info.html -->
 {% extends "layout.html" %}
 
+<!-- Title of page determined by update field -->
 {% block title %}Update {{ field.replace('_', ' ').title() }} | Soaporium{% endblock %}
 
 {% block content %}
@@ -16,11 +18,14 @@
 {% endif %}
 {% endwith %}
 
-
 <div class="update-info-container">
+
     <h2>Update {{ valid_fields[field] }}</h2>
     <form method="POST" action="{{ url_for('update_info', field=field) }}" class="update-form">
+        <!-- Update form -->
+
         {% if field == 'password' %}
+        <!-- Password validation -->
         <label for="password">New password</label>
         <input type="password" id="password" name="password" maxlength="100" required>
 

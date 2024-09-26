@@ -1,4 +1,4 @@
-<!-- templates/home.html -->
+<!-- templates/layout.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,6 +12,7 @@
 
 <body>
     <div class="top-bar">
+        <!-- Contains home link in top-left and icon -->
         <a href="{{ url_for('home') }}" class="home-link"><img class="home-icon" src="/static/images/favicon.jpg"
                 alt="Soaporium Unicorn"> Soaporium</a>
         <nav class="navbar">
@@ -27,6 +28,7 @@
                 </li>
 
                 {% if session.get("userid") %}
+                <!-- If user logged in, show cart and user dropdown -->
                 <li><a href="{{ url_for('view_current_cart') }}"><i class="fa fa-shopping-cart"></i> Cart</a></li>
                 <li class="user-dropdown">
                     <button class="user-dropdown-btn"><i class="fa fa-list"></i> Hi, {{ user_firstname }}</i></button>

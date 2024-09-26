@@ -1,3 +1,4 @@
+<!-- /templates/cart.html-->
 {% extends "layout.html" %}
 
 {% block title %}Cart | Soaporium{% endblock %}
@@ -19,6 +20,7 @@
 <div class="cart-container">
     <h1>My Cart</h1>
 
+    <!-- If there are items in cart -->
     {% if cart_items and cart_items|length > 0 %}
     <ul>
         {% for item in cart_items %}
@@ -29,17 +31,18 @@
             <p>Total Price: ${{ item.total_unit_price }}</p> <!-- Total price for each soap -->
 
             <div class="cart-quantity">
+                    <!-- Decrease quantity button-->
                     <form action="{{ url_for('decrease_quantity', soapid=item.soapid) }}" method="POST">
                         <input type="hidden" name="redirect_url" value="{{ request.url }}">
                         <button type="submit" class="quantity-button decrease-quantity">-</button>
                     </form>
+                    <!-- Increase quantity button -->
                     <form action="{{ url_for('add_to_cart') }}" method="POST">
                         <input type="hidden" name="soapid" value="{{ item.soapid }}">
                         <input type="hidden" name="redirect_url" value="{{ request.url }}">
                         <button type="submit" class="quantity-button increase-quantity">+</button>
                     </form>
                 </div>
-            
         </li>
         {% endfor %}
     </ul>

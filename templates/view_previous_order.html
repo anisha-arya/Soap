@@ -21,6 +21,7 @@
     <h1>Order Details</h1>
 
     {% if cart_items and cart_items|length > 0 %}
+    <!-- If there are cart items -->
     <ul>
         {% for item in cart_items %}
         <li class="cart-item">
@@ -67,8 +68,8 @@
 
     <!-- Navigation links -->
     <div class="cart-navigation">
-        <a href="{{ url_for('previous_carts') }}"><button>Back to previous orders</button></a>
-        <a href="{{ url_for('home') }}"><button>Back to home</button></a>
+        <a href="{{ url_for('previous_carts') }}">Back to previous orders</a> | 
+        <a href="{{ url_for('home') }}">Back to home</a>
     </div>
 </div>
 {% endblock %}

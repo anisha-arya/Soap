@@ -1,3 +1,4 @@
+<!-- /templates/search.html -->
 {% extends "layout.html" %}
 
 {% block title %}Search Results | Soaporium{% endblock %}
@@ -12,6 +13,7 @@
             <li class="sort-dropdown">
                 <button class="sort-button">Sort <i class="fa fa-unsorted"></i></button>
                 <ul class="search-dropdown-content">
+                    <!-- Sort options -->
                     <li>
                         <a href="{{ url_for('search', search_term=search_term, sort='alpha') }}">
                             Alphabetical
@@ -29,7 +31,6 @@
                     </li>
                 </ul>
             </li>
-
             <input type="text" name="search_term" maxlength="50" placeholder="Search..." value="{{ search_term }}">
             <button type="submit" class="search-button"><i class="fa fa-search"></i></button>
         </div>
@@ -37,7 +38,7 @@
 
     <!-- Clear Filters Link -->
     <li class="clear-filters">
-        <p><a href="{{ url_for('search', search_term=search_term) }}">Reset sort</a></p>
+        <a href="{{ url_for('search', search_term=search_term) }}">Reset sort</a>
     </li>
 
     {% if results and results|length > 0 %}
@@ -53,11 +54,14 @@
                 {% if item[0] in cart_quantities %}
                 <!-- If the soap is already in the cart -->
                 <div class="cart-quantity">
+                    <!-- Decrease quantity button -->
                     <form action="{{ url_for('decrease_quantity', soapid=item[0]) }}" method="POST">
                         <input type="hidden" name="redirect_url" value="{{ request.url }}">
                         <button type="submit" class="quantity-button decrease-quantity">-</button>
                     </form>
+                    <!-- Show how many of that soap in cart -->
                     <span class="quantity-display">{{ cart_quantities[item[0]] }}</span>
+                    <!-- Increase quantity button -->
                     <form action="{{ url_for('add_to_cart') }}" method="POST">
                         <input type="hidden" name="soapid" value="{{ item[0] }}">
                         <input type="hidden" name="redirect_url" value="{{ request.url }}">
@@ -66,7 +70,7 @@
                 </div>
                 {% else %}
                 <!-- If the soap is not in the cart -->
-                <form action="{{ url_for('add_to_cart') }}" method="POST">
+                <form action="{{ url_for('add_to_cart') }}" method="POST" class="add-to-cart">
                     <input type="hidden" name="soapid" value="{{ item[0] }}">
                     <input type="hidden" name="redirect_url" value="{{ request.url }}">
                     <button type="submit" class="add-to-cart">Add to Cart</button>
@@ -91,7 +95,7 @@
             {% endwith %}
             <hr>
             {% endfor %}
-            </li>
+        </li>
     </ul>
     {% else %}
     <p class="no-results">No results found</p> <!-- If no results, show this message -->
