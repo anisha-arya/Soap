@@ -35,7 +35,7 @@ li {
 }
 
 a {
-    color:#98c1d9;
+    color: #98c1d9;
     text-decoration: none;
 }
 
@@ -398,7 +398,9 @@ input[type="password"] {
 .faqs-page,
 .cart-container,
 .contact-form-container,
-.user-info-container {
+.user-info-container,
+.previous-carts-list {
+    text-align: center;
     max-width: 800px;
     margin: auto;
     padding: 20px;
@@ -460,6 +462,10 @@ input[type="password"] {
 .sort-dropdown:hover .search-dropdown-content,
 .sort-dropdown:hover .search-dropdown-content {
     display: block;
+}
+
+.sort-button {
+    min-width: 100px;
 }
 
 .search-dropdown-content a {
@@ -529,28 +535,38 @@ input[type="password"] {
 }
 
 /* Quantity Buttons Alignment */
-.cart-quantity {
+.confirm-delete {
     display: flex;
+    width: 25%;
     align-items: center;
 }
 
-.quantity-button {
+.quantity-button,
+.confirm-delete-button,
+.delete-back-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 40px;
-    width: 40px;
+    height: 100%;
+    width: auto;
     color: #fff;
     border: none;
     border-radius: 3px;
     cursor: pointer;
     font-size: 16px;
     box-sizing: border-box;
+    text-decoration: none;
+}
+
+.cart-quantity {
+    display: flex;
+    width: 100%;
+    align-items: center;
 }
 
 /* Cart */
 .cart-item {
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
@@ -582,6 +598,7 @@ input[type="password"] {
 /* Buttons */
 button,
 .btn {
+    text-decoration: none;
     padding: 10px 20px;
     background-color: #b5446e;
     color: #faf9f9;
@@ -661,15 +678,6 @@ textarea {
     background-color: #f9f9f9;
 }
 
-.credit-item a {
-    text-decoration: none;
-    color: #b5446e;
-}
-
-.credit-item a:hover {
-    text-decoration: underline;
-}
-
 /* Update Info Page */
 .update-container {
     max-width: 800px;
@@ -696,21 +704,16 @@ textarea {
     box-sizing: border-box;
 }
 
-/* Responsive Design */
-@media (min-width: 1030px) {
-    .results-list {
-        grid-template-columns: repeat(3, 1fr);
-    }
+.delete-account-link {
+    margin-top: 30px;
+    color: #b5446e;
 }
 
-@media (max-width: 1029px) and (min-width: 800px) {
-    .results-list {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.delete-confirmation button {
+    display: flex;
+    justify-content: center;
 }
 
-@media (max-width: 799px) {
-    .results-list {
-        grid-template-columns: repeat(1, 1fr);
-    }
+.delete-confirmation a:hover {
+    text-decoration: none;
 }
